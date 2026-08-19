@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Beer Festival Tap List
  * Description: Real-time tap list management for beer festivals
- * Version: 2.0.0
+ * Version: 2.2.4
  * Author: Beer Festival Tap List Contributors
  * Requires at least: 6.0
  * Requires PHP: 7.4
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('BEER_FESTIVAL_VERSION', '2.0.0');
+define('BEER_FESTIVAL_VERSION', '2.2.4');
 define('BEER_FESTIVAL_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BEER_FESTIVAL_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -45,6 +45,7 @@ add_action('plugins_loaded', 'beer_festival_init_plugin');
 function beer_festival_init_plugin() {
     // Load required classes
     $core_files = [
+        'includes/class-categories.php',  // Beer/tap categories
         'includes/class-beer-cpt.php',    // Beer custom post type
         'includes/class-tap-manager.php', // Tap management
         'includes/class-settings.php',    // Plugin settings
@@ -68,6 +69,29 @@ function beer_festival_init_plugin() {
     }
     new Beer_Festival_Public();
     new Beer_Festival_REST();
+
+    add_action('init', 'beer_festival_maybe_upgrade', 20);
+}
+
+/**
+ * Runs once per version bump, after CPT registration (init priority 10) so
+ * flush_rewrite_rules() picks up the current rewrite rules.
+ */
+function beer_festival_maybe_upgrade() {
+    $db_version = get_option('beer_festival_db_version', '');
+    if ($db_version === BEER_FESTIVAL_VERSION) {
+        return;
+    }
+
+    Tap_Manager::create_tap_status_table();
+    flush_rewrite_rules();
+
+    // Backfill any taps with no zone to the protected "Default" category.
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'tap_status';
+    $wpdb->query("UPDATE $table_name SET category = 'Default' WHERE category IS NULL OR category = ''");
+
+    update_option('beer_festival_db_version', BEER_FESTIVAL_VERSION);
 }
 
 // Handle uninstallation

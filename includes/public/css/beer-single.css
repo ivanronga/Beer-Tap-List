@@ -1,0 +1,44 @@
+.bftl-beer-single-wrapper {
+    max-width: 640px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: #22252d;
+    color: #fff;
+    border-radius: 8px;
+}
+
+.bftl-beer-single-title {
+    color: #ea7d00;
+    margin-top: 0;
+}
+
+.bftl-beer-single-meta p,
+.bftl-beer-single-status p {
+    margin: 0.4em 0;
+}
+
+.bftl-current-taps {
+    list-style: none;
+    margin: 0.5em 0;
+    padding: 0;
+}
+
+.bftl-current-taps li {
+    margin: 0.4em 0;
+}
+
+.bftl-beer-single-assign {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.bftl-beer-single-assign label {
+    display: block;
+    margin-bottom: 0.4em;
+}
+
+#bftl-beer-assign-feedback {
+    margin-left: 8px;
+    font-weight: 600;
+}

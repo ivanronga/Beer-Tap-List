@@ -6,6 +6,48 @@ class Beer_Festival_Public {
     public function __construct() {
         add_shortcode('beer_tap_list', [$this, 'render_tap_list']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_public_assets']);
+        add_filter('single_template', [$this, 'load_single_beer_template']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_single_beer_assets']);
+    }
+
+    public function load_single_beer_template($template) {
+        if (is_singular('beer')) {
+            $plugin_template = BEER_FESTIVAL_PLUGIN_DIR . 'includes/public/templates/single-beer.php';
+            if (file_exists($plugin_template)) {
+                return $plugin_template;
+            }
+        }
+        return $template;
+    }
+
+    public function enqueue_single_beer_assets() {
+        if (!is_singular('beer')) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'bftl-beer-single-styles',
+            $this->get_asset_url('css/beer-single.css'),
+            [],
+            BEER_FESTIVAL_VERSION
+        );
+
+        wp_enqueue_script(
+            'bftl-beer-single',
+            $this->get_asset_url('js/beer-single.js'),
+            ['jquery'],
+            BEER_FESTIVAL_VERSION,
+            true
+        );
+
+        wp_localize_script(
+            'bftl-beer-single',
+            'BeerSingle',
+            [
+                'beer_id'         => get_queried_object_id(),
+                'assign_rest_url' => rest_url('beer-festival-tap-list/v1/taps/assign'),
+            ]
+        );
     }
 
     private function get_asset_url($relative_path) {
@@ -210,6 +252,7 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
                     'tap_id' => $tap_id,
                     'beer_name' => $beer->post_title,
                     'beer_style' => get_post_meta($beer->ID, '_beer_stil', true),
+                    'beer_category' => get_post_meta($beer->ID, '_beer_category', true),
                     'brewer_name' => get_post_meta($beer->ID, '_beer_brewer', true),
                     'brewer_location' => get_post_meta($beer->ID, '_beer_location', true),
                     'ibu' => get_post_meta($beer->ID, '_beer_ibu', true),

@@ -21,6 +21,7 @@ class Tap_Manager {
             beer_id BIGINT UNSIGNED DEFAULT NULL,
             tapped_time DATETIME DEFAULT NULL,
             active TINYINT(1) DEFAULT 1,
+            category VARCHAR(50) DEFAULT NULL,
             last_updated_by BIGINT UNSIGNED DEFAULT NULL,
             last_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (tap_id)
@@ -68,9 +69,10 @@ class Tap_Manager {
                     'beer_id' => $beer_id,
                     'tapped_time' => $now,
                     'active' => 1,
-                    'last_updated_by' => $user_id
+                    'last_updated_by' => $user_id,
+                    'category' => 'Default'
                 ],
-                ['%d', '%d', '%s', '%d', '%d']
+                ['%d', '%d', '%s', '%d', '%d', '%s']
             );
         }
         
@@ -99,6 +101,39 @@ class Tap_Manager {
             [ '%d' ]
         );
         do_action('beer_festival_tap_updated', $tap_id, $user_id, 'clear');
+    }
+
+    /**
+     * Set the fixed category/zone for a tap, independent of the beer currently on it.
+     */
+    public static function set_tap_category($tap_id, $category) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'tap_status';
+
+        $current_tap = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE tap_id = %d",
+            $tap_id
+        ));
+
+        if ($current_tap) {
+            $wpdb->update(
+                $table_name,
+                ['category' => $category],
+                ['tap_id' => $tap_id],
+                ['%s'],
+                ['%d']
+            );
+        } else {
+            $wpdb->insert(
+                $table_name,
+                [
+                    'tap_id' => $tap_id,
+                    'active' => 0,
+                    'category' => $category
+                ],
+                ['%d', '%d', '%s']
+            );
+        }
     }
 
     /**

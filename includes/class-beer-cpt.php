@@ -31,11 +31,12 @@ class Beer_CPT {
         $args = [
             'labels'             => $labels,
             'public'             => false,
+            'publicly_queryable' => true,
             'show_ui'            => true,
             'show_in_menu'       => false, // We'll handle this manually in admin
             'supports'           => ['title'],
             'has_archive'        => false,
-            'rewrite'            => false,
+            'rewrite'            => ['slug' => 'beer', 'with_front' => false],
             'capability_type'    => 'post',
             'menu_icon'          => 'dashicons-beer',
         ];
@@ -86,8 +87,18 @@ class Beer_CPT {
             'location'  => get_post_meta($post->ID, '_beer_location', true),
             'ibu'       => get_post_meta($post->ID, '_beer_ibu', true),
             'abv'       => get_post_meta($post->ID, '_beer_abv', true),
+            'category'  => get_post_meta($post->ID, '_beer_category', true),
         ];
         ?>
+        <p>
+            <label><?php _e('Category:', 'beer-festival-tap'); ?></label><br>
+            <select name="beer_category" required style="width:100%;">
+                <option value="" <?php selected($fields['category'], ''); ?>><?php _e('-- Select --', 'beer-festival-tap'); ?></option>
+                <?php foreach (Beer_Festival_Categories::get_selectable(false) as $category): ?>
+                <option value="<?php echo esc_attr($category); ?>" <?php selected($fields['category'], $category); ?>><?php echo esc_html($category); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </p>
         <p>
             <label><?php _e('Beer style:', 'beer-festival-tap'); ?></label><br>
             <input type="text" name="beer_stil" value="<?php echo esc_attr($fields['stil']); ?>" style="width:100%;">
@@ -133,6 +144,12 @@ class Beer_CPT {
         update_post_meta($post_id, '_beer_location', sanitize_text_field($_POST['beer_location'] ?? ''));
         update_post_meta($post_id, '_beer_ibu', intval($_POST['beer_ibu'] ?? 0));
         update_post_meta($post_id, '_beer_abv', floatval($_POST['beer_abv'] ?? 0));
+
+        $category = sanitize_text_field($_POST['beer_category'] ?? '');
+        if (!in_array($category, Beer_Festival_Categories::get_selectable(false), true)) {
+            $category = '';
+        }
+        update_post_meta($post_id, '_beer_category', $category);
     }
 
     // Ensure CPT appears under custom admin menu

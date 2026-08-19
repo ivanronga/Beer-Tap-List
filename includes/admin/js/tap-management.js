@@ -6,42 +6,68 @@ jQuery(document).ready(function($) {
         width: 'resolve'
     });
 
-    // Handle "Clear" tap button
+    function showRowFeedback($row, message, isError) {
+        var $feedback = $row.find('.bftl-row-feedback');
+        $feedback
+            .text(message)
+            .removeClass('bftl-feedback-success bftl-feedback-error')
+            .addClass(isError ? 'bftl-feedback-error' : 'bftl-feedback-success');
+        setTimeout(function() {
+            $feedback.text('');
+        }, 4000);
+    }
+
+    function setRowDirty($row, isDirty) {
+        var $saveButton = $row.find('.bftl-save-tap');
+        $saveButton.prop('disabled', !isDirty);
+        $saveButton.toggleClass('button-primary', isDirty);
+    }
+
+    function saveRow($row, beerId) {
+        var tapId = $row.data('tap');
+
+        wp.apiFetch({
+            url: BFTL.assign_rest_url,
+            method: 'POST',
+            data: { tap_id: tapId, beer_id: beerId ? parseInt(beerId, 10) : 0 }
+        }).then(function() {
+            setRowDirty($row, false);
+            showRowFeedback($row, 'Saved', false);
+        }).catch(function(error) {
+            showRowFeedback($row, (error && error.message) ? error.message : 'Error', true);
+        });
+    }
+
+    // Mark the row as having unsaved changes once the beer selection changes
+    $('.bftl-tap-beer').on('change', function() {
+        var $row = $(this).closest('tr');
+        setRowDirty($row, true);
+    });
+
+    // Handle "Save" button per row
+    $('.bftl-save-tap').on('click', function(e) {
+        e.preventDefault();
+        var $row = $(this).closest('tr');
+        var beerId = $row.find('.bftl-tap-beer').val();
+        saveRow($row, beerId);
+    });
+
+    // Handle "Clear" tap button — immediately saves an empty assignment
     $('.bftl-clear-tap').on('click', function(e) {
         e.preventDefault();
         var $row = $(this).closest('tr');
-        $row.find('select.bftl-select2').val('').trigger('change');
-    });
-
-    // Handle Save All Changes
-    $('#bftl-tap-form').on('submit', function(e) {
-        e.preventDefault();
-
-        var $form = $(this);
-        var formData = $form.serializeArray();
-        var tapBeer = {};
-
-        // Gather tap assignments
-        formData.forEach(function(item) {
-            // tap_beer[1], tap_beer[2], ...
-            var match = item.name.match(/^tap_beer\[(\d+)\]$/);
-            if (match) {
-                tapBeer[match[1]] = item.value;
-            }
-        });
-
-        // Show loading indicator (optional)
-        var $feedback = $('#bftl-admin-feedback');
-        $feedback.html('<div class="notice notice-info"><p>Saving...</p></div>');
+        var tapId = $row.data('tap');
 
         wp.apiFetch({
-            url: BFTL.taps_rest_url,
+            url: BFTL.assign_rest_url,
             method: 'POST',
-            data: { tap_beer: tapBeer }
-        }).then(function(response) {
-            $feedback.html('<div class="notice notice-success"><p>' + response.message + '</p></div>');
+            data: { tap_id: tapId, beer_id: 0 }
+        }).then(function() {
+            $row.find('select.bftl-select2').val('').trigger('change');
+            setRowDirty($row, false);
+            showRowFeedback($row, 'Cleared', false);
         }).catch(function(error) {
-            $feedback.html('<div class="notice notice-error"><p>' + (error && error.message ? error.message : 'An error occurred.') + '</p></div>');
+            showRowFeedback($row, (error && error.message) ? error.message : 'Error', true);
         });
     });
 
