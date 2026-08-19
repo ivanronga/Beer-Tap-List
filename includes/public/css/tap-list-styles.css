@@ -1,0 +1,321 @@
+
+
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Slab:wght@400;700;900&display=swap");:root{
+    --unit:4px;
+    --radius-full:1000px;
+    --radius-base:4px;
+    --radius-lrg:8px;
+    --radius-xlrg:24px;
+    --radius-xxlrg:160px;
+
+    --bg-color:#22252d;
+    --color-primary:#207420;
+    --color-secondary:#ea7d00;
+    --color-text:#fff;
+
+    --type-xtiny:11px;
+    --type-tiny:13px;
+    --type-small:16px;
+    --type-base:18px;
+    --type-medium:20px;
+    --type-xmedium:21px;
+    --type-xxmedium:22px;
+	--type-large:24px;
+	--type-xlarge:30px;
+	--type-xxlarge:32px;
+	--type-xxxlarge:40px;
+	--type-huge:56px;
+	--type-weight-regular:400;
+	--type-weight-semibold:600;
+	--type-weight-bold:700;
+	--ff-sans:"Roboto Slab", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif, Helvetica, Arial, sans-serif;
+
+	--ff-no:"Bebas Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif, Helvetica, Arial, sans-serif;
+}*,:after,:before{
+    box-sizing:inherit;
+}html{
+    box-sizing:border-box;
+    font-size:var(--type-base);
+    height:100%;
+    line-height:30px;
+    scroll-behavior:smooth;
+}body{
+    background-color:var(--bg-color);
+    color:var(--color-text);
+
+    font-family:var(--ff-sans);
+    margin:0;
+    min-height:100%;
+    overflow-x:hidden;
+}img,picture{
+    display:block;
+    vertical-align:middle;
+}img,picture,svg{
+    max-width:100%;
+}svg{
+    height:auto;
+}iframe{
+    margin-top:0;
+}h1,h2,h3,h4,h5,h6{
+    color:var(--color-primary);
+    font-family:var(--ff-sans);
+    font-weight:var(--type-weight-regular);
+    margin:0;
+}h1{
+    font-size:var(--type-xxxlarge);
+}h2{
+    font-size:var(--type-xxlarge);
+}h3{
+    font-size:var(--type-large);
+}h4,h5,h6{
+    font-size:var(--type-medium);
+
+}p{
+    margin:0;
+}dl,ul{
+    list-style:none;
+}dl,ol,ul{
+    margin:0;
+    padding:0;
+}a{
+    color:var(--color-primary);
+    text-decoration:none;
+    -webkit-text-decoration-skip:ink;
+            text-decoration-skip-ink:auto;
+}a:focus,a:hover{
+    color:var(--color-primary);
+}a:focus{
+    outline:0;
+}hr{
+    border-top:1px solid #b3e7f3;
+}b,strong{
+    font-weight:700
+}small{
+    font-size:var(--type-tiny);
+    line-height:24px;
+}code{
+    background-color:var(--color-text lightness(80%));
+    color:var(--color-primary);
+    padding:calc(var(--unit)/2);
+}.htp-btn{
+    align-items:center;
+    border:0;
+
+    cursor:pointer;
+    display:inline-flex;
+    line-height:normal;
+    text-align:center;
+    text-decoration:none;
+
+    touch-action:manipulation;
+
+    transition:all .25s ease-out;
+    -webkit-user-select:none;
+       -moz-user-select:none;
+            user-select:none;
+    white-space:nowrap;
+
+    }.htp-btn:focus{
+        box-shadow:0 0 10px rgba(0,0,0,.4);
+        outline:0;
+    }.htp-btn{
+    border-radius:var(--radius-full);
+    font-family:var(--ff-sans);
+    font-weight:var(--type-weight-regular);}.htp-btn--base{
+        font-size:16px;
+        padding:calc(var(--unit)*4) calc(var(--unit)*8);
+    }.htp-btn--base--circle{
+            padding:calc(var(--unit)*4);
+        }.htp-btn--primary{
+        background-color:var(--color-primary); 
+        color:#fff;
+    }.htp-btn--primary:focus,.htp-btn--primary:hover{
+            background-color:var(--color-secondary);
+            color:#fff;
+        }:root{
+  --gutter:0;
+  --side-w:auto;
+  --stat-w:150px;
+  --bg:#fbfbfb;
+  --bg-color:var(--bg);
+  --row-bg:#22252d;
+  --row-alt-bg:#393b42;
+}.bftl-tap-list{
+  width:100%;
+}@media screen and (min-width:782px){.bftl-tap-list{
+    display:grid;
+    gap:0;
+    grid-template-columns:repeat(1, 1fr);
+    grid-template-rows:repeat(16, 6.25vh);
+    height:100vh
+}
+  }.tap-item{
+  align-items:center;
+  background:var(--row-bg);
+  border-bottom:1px solid hsla(0,0%,100%,.5);
+  display:grid;
+  gap:var(--gutter);
+}.tap-item .tap-item--inner{
+	background-color:var(--row-bg);
+  }.tap-item:nth-of-type(2n),.tap-item:nth-of-type(2n) .tap-item--inner{
+      background-color:var(--row-alt-bg);
+    }.tap-item--inner{
+  background:var(--bg-color);
+  border-radius:0;
+  font-size:14px;
+  padding:6px 8px;
+}.tap-item--inner.beer-name{
+  font-weight:600;
+}.tap-item--inner.is-beer-style{
+  color:var(--bg-color);
+  font-size:13px;
+}.tap-item--inner.abv,.tap-item--inner.ibu,.tap-item--inner.is-tap-number{
+  font-weight:400;
+  text-align:center;
+}.tap-item--inner.is-tap-number{ grid-area:is-tap-number; justify-content:center; }.tap-item--inner.beer-name{ grid-area:beer-name; }.tap-item--inner.is-beer-style{ grid-area:is-beer-style; }.tap-item--inner.brewer-name{ grid-area:brewer-name; }.tap-item--inner.brewer-location{ grid-area:brewer-location; }.tap-item--inner.ibu{ grid-area:ibu; }.tap-item--inner.abv{ grid-area:abv; }@media (max-width:600px){
+  .tap-item--inner.abv,.tap-item--inner.beer-name,.tap-item--inner.brewer-location,.tap-item--inner.brewer-name,.tap-item--inner.ibu{ font-size:18px; }
+  .tap-item{
+    grid-template-areas:"is-tap-number beer-name      beer-name        ibu  abv" "is-tap-number is-beer-style  is-beer-style    ibu  abv" "is-tap-number brewer-name    brewer-location  ibu  abv";
+    grid-template-columns:var(--side-w) 3fr 3fr 60px 60px;
+  }
+
+  .tap-item--inner{
+    border:1px solid hsla(0,0%,100%,.5);
+  }
+  .tap-item--inner.beer-name,.tap-item--inner.brewer-location,.tap-item--inner.brewer-name,.tap-item--inner.is-beer-style{
+    height:100%;
+    text-align:left;
+  }
+
+  .tap-item--inner.abv,.tap-item--inner.ibu,.tap-item--inner.is-tap-number{
+    align-items:center;
+    display:flex;
+    flex-direction:column;
+    height:100%;
+    justify-content:center;
+  }
+}@media (min-width:601px){
+  .tap-item{
+    align-items:center;
+    grid-auto-rows:minmax(48px, auto);
+    grid-template-areas:"is-tap-number beer-name is-beer-style brewer-name brewer-location ibu abv";
+    grid-template-columns:var(--side-w) 2fr 1.2fr 1.4fr 1fr var(--stat-w) var(--stat-w);
+  }
+  .tap-item--inner.abv,.tap-item--inner.ibu,.tap-item--inner.is-tap-number{
+    align-self:center;
+  }
+
+  .tap-item--inner.beer-name,.tap-item--inner.brewer-location,.tap-item--inner.brewer-name,.tap-item--inner.is-beer-style{
+    text-align:left;
+  }
+}.tap-item--inner.beer-name{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}.tap-number{
+  background-color:#fbb040;
+  border-radius:50%;
+  color:#000;
+  display:block;
+  font-family:var(--ff-no);
+  font-size:3.5vh;
+  height:4vh;
+  line-height:4.5vh;
+  text-align:center;
+  width:4vh;
+}@media (max-width:600px){.tap-number{
+    font-family:var(--ff-sans);
+    font-size:18px;
+    height:36px;
+    line-height:36px;
+    width:36px
+}
+  }.abv,.beer-style,.brewer-location,.brewer-name,.ibu{
+  font-size:3vh;
+}.beer-name{
+  font-size:2.75vh;
+  font-weight:700;
+}.beer-style{
+  color:#fbb040;
+  
+  font-family:var(--ff-sans);
+}@media (max-width:600px){.beer-style{
+	font-size:18px
+}
+  }@media (min-width:601px){.beer-style{
+    align-items:center;
+    background-color:#fbb040;
+    border-radius:50px;
+    color:#000 !important;
+    display:inline-flex; 
+    font-family:var(--ff-no);
+    letter-spacing:.01em;
+    opacity:1;
+    padding:var(--unit) calc(var(--unit)*3) 0 calc(var(--unit)*3);
+    text-transform:uppercase
+}
+  }.abv{
+  justify-content:flex-end;
+}@media (min-width:601px){
+    .abv span{
+      display:inline-block;
+      width:80px;
+    }
+  }@media (max-width:600px){.empty-tap{
+    grid-column:2 /  6;
+    width:100%
+}
+  }.empty-tap--inner{
+  background-color:red;
+  font-size:3vh;
+}.empty-tap--inner,.new-indicator{
+  border-radius:50px;
+  font-family:var(--ff-no);
+  padding:var(--unit) calc(var(--unit)*3) 0 calc(var(--unit)*3);
+}.new-indicator{
+  align-items:center;
+  align-self:center;
+  animation:blink 2s ease-in-out infinite;
+  background-color:#fff;
+  color:var(--color-primary) !important;
+  display:inline-flex;
+  font-size:1.5vh;
+  font-size:3.5vh;
+  font-weight:400;
+  letter-spacing:.01em;
+  margin-left:calc(var(--unit)*2);
+  opacity:1;
+  text-transform:uppercase;
+}.tap-item.new-beer,.tap-item.new-beer .tap-item--inner{
+  background-color:var(--color-primary) !important;
+}@keyframes blink{
+  0%,to{ opacity:1; }
+  50%{ opacity:0; }
+}.icon{
+    background-position:50%;
+
+    background-repeat:no-repeat;
+    background-size:3vh;
+    display:inline-block;
+    flex-shrink:0;
+    height:3vh;
+    margin-right:calc(var(--unit)*2);
+    vertical-align:top; 
+    width:3vh;
+}@media (max-width:600px){.icon{
+        margin-right:0
+}
+    }.icon--hops{
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' fill='%236dda5c' viewBox='0 0 48 48'%3E%3Cpath d='M18.7 30.4c1.5 2.9 4.1 5.4 4.8 5.4s3.2-2.5 4.8-5.4c-1.4-.8-2.7-1.8-3.6-3.1 0 0 0-.1-.1-.1-.4.2-.8.3-1.1.3s-.7-.1-1.1-.3c0 0 0 .1-.1.1-1 1.3-2.2 2.3-3.6 3.1M24.9 9V3.6c0-.8-.7-1.5-1.5-1.5s-1.5.7-1.5 1.5V9c-5.4.6-12.3 4.4-12.5 11.9 1 .3 4.3.3 7.3-1.6l1-.6.5 1.1c1.2 2.6 4.3 5.4 5.2 5.6.9-.2 4-3 5.2-5.6l.5-1.1 1 .6c3 1.8 6.4 1.9 7.3 1.6-.2-7.5-7.1-11.3-12.5-11.9'/%3E%3Cpath d='M30 21.7c-.9 1.5-2.3 3.2-3.7 4.4 0 0 0 .1.1.1 2 2.9 7.3 4.3 9.1 4.3.3 0 .4 0 .5-.1.5-.3 1.3-4 .8-7.2h-.7c-1.8 0-4-.5-6.1-1.5M11.4 30.4c1.8 0 7.1-1.4 9.1-4.3 0 0 0-.1.1-.1-1.4-1.2-2.8-2.8-3.7-4.4-2.1 1-4.3 1.5-6 1.5h-.7c-.5 3.2.3 6.9.8 7.2 0 .1.1.1.4.1M15.3 38.5q.15 0 0 0c.7 0 2.7-1.1 4.6-2.8-1.4-1.5-2.6-3.4-3.1-4.4v-.1c-1.7.7-3.3 1.1-4.5 1.2.7 3.1 2.5 6 3 6.1M31.4 38.5s.1 0 0 0c.6-.2 2.4-3 3.1-6.1-1.2-.1-2.8-.5-4.5-1.2v.1c-.5 1-1.7 2.9-3.1 4.4 1.8 1.7 3.9 2.8 4.5 2.8M25.5 37.3l-.2-.1c-.7.5-1.3.8-1.9.8s-1.3-.3-1.9-.8l-.2.1c-.6.6-1.6 1.4-2.7 2.1 1.4 3 4.2 5.8 4.8 5.8s3.4-2.7 4.8-5.8c-1.1-.7-2.1-1.5-2.7-2.1'/%3E%3C/svg%3E");
+    }.icon--flask{
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' fill='%23e8556f' viewBox='0 0 48 48'%3E%3Cpath d='m38.9 31.4-9.6-16.1V8.7q0-.3.3-.3c.5 0 1-.4 1-1v-.3c0-.5-.4-1-1-1H18.3c-.5 0-1 .4-1 1v.3c0 .5.4 1 1 1q.3 0 .3.3v6.6L9 31.4c-.7 1.3-1 2.6-1 3.8.1 3 2.4 5.3 5.4 5.3h21.2c3 0 5.1-2.3 5.2-5.3.1-1.2-.2-2.5-.9-3.8m-22.8-5.5c-.5 0-.8-.6-.6-1l5-8.4c.2-.4.4-.9.4-1.3V8.4h6v6.7c0 .5.1 1 .4 1.4l5 8.4c.3.4-.1 1-.6 1z'/%3E%3C/svg%3E");
+    }.icon--fest{
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' fill='%23e4623f' viewBox='0 0 48 48'%3E%3Cpath d='M3.6 17.6c0-1.8 1.5-3.3 3.3-3.3s3.3 1.5 3.3 3.3c0 .8-.3 1.6-.8 2.2l7 6.3 6.5-16.7c-1.7-.7-2.5-2.6-1.9-4.2.7-1.7 2.6-2.5 4.2-1.9 1.7.7 2.5 2.6 1.9 4.2-.3.9-1 1.5-1.9 1.9l6.5 16.7 7-6.3c-1.2-1.4-1.1-3.4.3-4.6s3.4-1.1 4.6.3 1.1 3.4-.3 4.6c-.8.7-1.8 1-2.8.8l-2.7 14.7c-.1.5-.5.8-.9.8H11.1c-.5 0-.9-.3-.9-.8L7.4 20.8c-1.8.3-3.5-.8-3.8-2.6zm35.8 22.2c0-.9-.7-1.6-1.6-1.6H10.1c-.9 0-1.6.7-1.6 1.6s.7 1.6 1.6 1.6h27.7c.9 0 1.6-.7 1.6-1.6'/%3E%3C/svg%3E");
+    }.icon--homebrew{
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' width='48' height='48' fill='%23fff'%3E%3Cpath d='M28.8 9.1c.1-.3.1-.7.1-1 0-2.7-2.2-4.9-4.9-4.9s-4.9 2.2-4.9 4.9c0 .3 0 .7.1 1-6.6.7-11.3 2.6-11.4 4.7h32.3c.1-2.1-4.7-4-11.3-4.7M25.7 9h-3.4c-.1-.2-.2-.5-.2-.8 0-1 .8-1.9 1.9-1.9 1 0 1.9.8 1.9 1.9 0 .2-.1.5-.2.8M44.9 18.4h-4.7v-2.1H7.9v2.1H3.1c-1.4 0-2.5 1.1-2.5 2.5s1.1 2.5 2.5 2.5h4.7v14.8c0 2.3 1.8 4.1 4.1 4.1H36c2.3 0 4.1-1.8 4.1-4.1V23.4h4.7c1.4 0 2.5-1.1 2.5-2.5.1-1.4-1-2.5-2.4-2.5M14.2 37.3c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5V20.2c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5z'/%3E%3C/svg%3E");
+    }.icon--craft{
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' fill='%2320b2aa' viewBox='0 0 48 48'%3E%3Cpath d='M1.8 13.2v-.6C1.8 6.4 4.1 4 7 4c.9 0 1.4.1 2 .4v3.2C8.4 7.2 7.8 7 7.3 7 5.9 7 5 8.2 5 12.6v.7c0 4.7 1 5.6 2.4 5.6.5 0 1.1-.2 1.7-.6v3c-.7.4-1.4.5-2.3.5-2.9.1-5-2.4-5-8.6M10.6 4.1h3.2c3.2 0 5.5 1.7 5.5 5.6v.3c0 2.3-.9 3.8-2.1 4.6l2.4 7.2h-3.3l-2-6.2h-.6v6.2h-3.1zm3.2 8.7c1.3 0 2.3-.8 2.3-2.9v-.1C16.1 7.6 15 7 13.7 7h-.1v5.9h.2zM23.1 4h3.3l3.4 17.7h-3.1l-.6-3.5h-2.8l-.6 3.5h-3zm2.5 11.5-.9-5.8-1 5.8zM30.7 4.1h6.4V7h-3.4v4.4h2.9v2.9h-2.9v7.4h-3.1V4.1zM40.2 7H38V4.1h7.4V7h-2.2v14.7h-3.1V7zM3.1 25.1h2.7c3 0 5.8 1.2 5.8 4.5v.1c0 2.3-1.3 3.4-2.6 4 1.5.7 2.8 1.7 2.8 3.9v.2c0 3.1-2.4 4.9-5.9 4.9H3.1zm3.1 7.4c1.4 0 2.3-.8 2.3-2.3v-.1c0-1.5-.9-2.2-2.3-2.2zm0 7.4c1.4 0 2.4-.8 2.4-2.3v-.1c0-1.5-1-2.3-2.4-2.3zM13 25.1h6.8V28h-3.7v4.4h3.3v2.9h-3.3v4.5h3.8v2.9H13zM21.4 25.1h6.8V28h-3.7v4.4h3.3v2.9h-3.3v4.5h3.8v2.9h-6.8V25.1zM29.7 25.1h3.2c3.2 0 5.5 1.7 5.5 5.6v.3c0 2.3-.9 3.8-2.1 4.6l2.4 7.2h-3.3l-2-6.2h-.6v6.2h-3.1zm3.2 8.7c1.3 0 2.3-.8 2.3-2.9v-.2c0-2.2-1.1-2.8-2.4-2.8h-.1v5.9z'/%3E%3C/svg%3E");
+    }
+
+
+
