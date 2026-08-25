@@ -120,6 +120,46 @@ class Beer_Festival_Settings {
         ?>
         <div class="wrap">
             <h1><?php _e('Beer Festival Tap List Settings', 'beer-festival-tap'); ?></h1>
+
+            <div class="card" style="max-width: 600px; margin: 1em 0;">
+                <h2><?php _e('Displaying the Tap List', 'beer-festival-tap'); ?></h2>
+                <p><?php _e('Add this shortcode to any page or post to display the live, auto-refreshing tap list on the frontend:', 'beer-festival-tap'); ?></p>
+                <p>
+                    <input type="text" readonly value="[beer_tap_list]" id="bftl-shortcode-field" class="regular-text" onclick="this.select();">
+                    <button type="button" class="button" id="bftl-shortcode-copy"><?php _e('Copy', 'beer-festival-tap'); ?></button>
+                </p>
+                <p class="description">
+                    <?php _e('The "Frontend Wrapper" setting below controls how it is displayed: choose DIV to embed the tap list inline within your page content, or IFRAME to show it fullscreen (for example on a dedicated screen at the festival venue).', 'beer-festival-tap'); ?>
+                </p>
+            </div>
+            <script>
+            (function() {
+                var button = document.getElementById('bftl-shortcode-copy');
+                var field = document.getElementById('bftl-shortcode-field');
+                if (!button || !field) return;
+
+                function showCopied() {
+                    var original = button.textContent;
+                    button.textContent = '<?php echo esc_js(__('Copied!', 'beer-festival-tap')); ?>';
+                    setTimeout(function() { button.textContent = original; }, 2000);
+                }
+
+                button.addEventListener('click', function() {
+                    field.select();
+                    field.setSelectionRange(0, field.value.length);
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(field.value).then(showCopied, function() {
+                            document.execCommand('copy');
+                            showCopied();
+                        });
+                    } else {
+                        document.execCommand('copy');
+                        showCopied();
+                    }
+                });
+            })();
+            </script>
+
             <form method="post" action="options.php">
                 <?php
                 settings_fields('beer_festival_settings_group');

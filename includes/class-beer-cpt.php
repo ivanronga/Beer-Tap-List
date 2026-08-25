@@ -3,6 +3,24 @@ if (!defined('ABSPATH')) exit;
 
 class Beer_CPT {
 
+    private $list_columns = [
+        'beer_category' => 'Category',
+        'beer_style'    => 'Style',
+        'beer_brewer'   => 'Brewer',
+        'beer_location' => 'Location',
+        'beer_ibu'      => 'IBU',
+        'beer_abv'      => 'ABV',
+    ];
+
+    private $list_column_meta_keys = [
+        'beer_category' => '_beer_category',
+        'beer_style'    => '_beer_stil',
+        'beer_brewer'   => '_beer_brewer',
+        'beer_location' => '_beer_location',
+        'beer_ibu'      => '_beer_ibu',
+        'beer_abv'      => '_beer_abv',
+    ];
+
     public function __construct() {
         add_action('init', [$this, 'register_beer_cpt']);
         // add_action('init', [$this, 'register_beer_style_taxonomy']);
@@ -10,6 +28,52 @@ class Beer_CPT {
         add_action('save_post', [$this, 'save_beer_meta_fields']);
         add_filter('parent_file', [$this, 'set_admin_menu_parent']);
         add_filter('submenu_file', [$this, 'set_admin_menu_submenu']);
+        add_filter('manage_beer_posts_columns', [$this, 'add_beer_list_columns']);
+        add_action('manage_beer_posts_custom_column', [$this, 'render_beer_list_column'], 10, 2);
+        add_filter('manage_edit-beer_sortable_columns', [$this, 'sortable_beer_list_columns']);
+        add_action('pre_get_posts', [$this, 'sort_beer_list_by_meta']);
+    }
+
+    public function add_beer_list_columns($columns) {
+        $new_columns = [];
+        foreach ($columns as $key => $label) {
+            $new_columns[$key] = $label;
+            if ($key === 'title') {
+                foreach ($this->list_columns as $column_key => $column_label) {
+                    $new_columns[$column_key] = __($column_label, 'beer-festival-tap');
+                }
+            }
+        }
+        return $new_columns;
+    }
+
+    public function render_beer_list_column($column, $post_id) {
+        if (!isset($this->list_column_meta_keys[$column])) {
+            return;
+        }
+        $value = get_post_meta($post_id, $this->list_column_meta_keys[$column], true);
+        if ($column === 'beer_abv' && $value !== '') {
+            $value .= '%';
+        }
+        echo esc_html($value);
+    }
+
+    public function sortable_beer_list_columns($columns) {
+        foreach ($this->list_columns as $column_key => $column_label) {
+            $columns[$column_key] = $column_key;
+        }
+        return $columns;
+    }
+
+    public function sort_beer_list_by_meta($query) {
+        if (!is_admin() || !$query->is_main_query()) {
+            return;
+        }
+        $orderby = $query->get('orderby');
+        if (isset($this->list_column_meta_keys[$orderby])) {
+            $query->set('meta_key', $this->list_column_meta_keys[$orderby]);
+            $query->set('orderby', $orderby === 'beer_ibu' || $orderby === 'beer_abv' ? 'meta_value_num' : 'meta_value');
+        }
     }
 
     // Register the 'beer' custom post type

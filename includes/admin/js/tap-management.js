@@ -3,7 +3,7 @@ jQuery(document).ready(function($) {
 
     // Initialize Select2 on all beer dropdowns
     $('.bftl-select2').select2({
-        width: 'resolve'
+        width: '320px'
     });
 
     function showRowFeedback($row, message, isError) {

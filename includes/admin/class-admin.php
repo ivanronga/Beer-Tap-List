@@ -122,7 +122,7 @@ class Beer_Festival_Admin {
         ?>
         <div class="wrap">
             <h1><?php _e('Tap Management', 'beer-festival-tap'); ?></h1>
-            <table class="widefat admin-table is-tap-manage">
+            <table class="admin-table is-tap-manage">
                 <thead>
                     <tr>
                         <th><?php _e('Tap #', 'beer-festival-tap'); ?></th>
@@ -187,7 +187,7 @@ class Beer_Festival_Admin {
         <div class="wrap">
             <h1><?php _e('Tap Zones', 'beer-festival-tap'); ?></h1>
             <p><?php _e('Assign a fixed category/zone to each tap. This is normally set up once before the event and does not change as beers are swapped.', 'beer-festival-tap'); ?></p>
-            <table class="widefat admin-table is-tap-manage">
+            <table class="admin-table is-tap-manage">
                 <thead>
                     <tr>
                         <th><?php _e('Tap #', 'beer-festival-tap'); ?></th>
@@ -245,13 +245,30 @@ class Beer_Festival_Admin {
         <div class="wrap bftl-qr-codes-page">
             <h1><?php _e('QR Codes', 'beer-festival-tap'); ?></h1>
             <p><?php _e('Print this page (Ctrl+P) to prepare QR codes for every beer ahead of the festival.', 'beer-festival-tap'); ?></p>
+            <p>
+                <input type="search" id="bftl-qr-search" placeholder="<?php esc_attr_e('Search by beer name…', 'beer-festival-tap'); ?>" style="width: 300px;">
+            </p>
             <div class="bftl-qr-grid">
                 <?php foreach ($beers as $beer): ?>
                 <div class="bftl-qr-item" data-permalink="<?php echo esc_attr($this->get_stable_beer_url($beer->ID)); ?>">
                     <div class="bftl-qr-item-code"></div>
                     <p class="bftl-qr-item-name"><?php echo esc_html($beer->post_title); ?></p>
+                    <div class="bftl-qr-item-actions">
+                        <button type="button" class="button bftl-qr-preview"><?php _e('Preview', 'beer-festival-tap'); ?></button>
+                        <button type="button" class="button bftl-qr-download"><?php _e('Download', 'beer-festival-tap'); ?></button>
+                        <button type="button" class="button bftl-qr-print"><?php _e('Print', 'beer-festival-tap'); ?></button>
+                    </div>
                 </div>
                 <?php endforeach; ?>
+            </div>
+
+            <div id="bftl-qr-modal" class="bftl-qr-modal">
+                <div class="bftl-qr-modal-backdrop"></div>
+                <div class="bftl-qr-modal-content">
+                    <button type="button" class="bftl-qr-modal-close" aria-label="<?php esc_attr_e('Close', 'beer-festival-tap'); ?>">&times;</button>
+                    <div class="bftl-qr-modal-code"></div>
+                    <p class="bftl-qr-modal-name"></p>
+                </div>
             </div>
         </div>
         <?php

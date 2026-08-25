@@ -1,9 +1,38 @@
 
+.is-tap-manage {
+    width: auto;
+    max-width: 760px;
+    border-collapse: collapse;
+}
+.is-tap-manage th,
+.is-tap-manage td {
+    text-align: left;
+    vertical-align: middle;
+    padding: 8px 10px;
+}
+.is-tap-manage th:first-child,
+.is-tap-manage td:first-child {
+    width: 50px;
+}
+.is-tap-manage .select2-container {
+    vertical-align: middle;
+}
+
 .bftl-qr-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(6, 1fr);
     gap: 16px;
     margin-top: 1rem;
+}
+@media screen and (max-width: 1200px) {
+    .bftl-qr-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media screen and (max-width: 600px) {
+    .bftl-qr-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 .bftl-qr-item {
     text-align: center;
@@ -22,6 +51,72 @@
     margin: 8px 0 0;
     word-break: break-word;
 }
+.bftl-qr-item-actions {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+.bftl-qr-item-actions .button {
+    font-size: 11px;
+    height: auto;
+    line-height: 1.4;
+    padding: 3px 8px;
+}
+
+.bftl-qr-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100000;
+    align-items: center;
+    justify-content: center;
+}
+.bftl-qr-modal.is-open {
+    display: flex;
+}
+.bftl-qr-modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+.bftl-qr-modal-content {
+    position: relative;
+    background: #fff;
+    border-radius: 6px;
+    padding: 30px;
+    text-align: center;
+    max-width: 90vw;
+}
+.bftl-qr-modal-code svg {
+    width: 280px;
+    max-width: 100%;
+    height: auto;
+}
+.bftl-qr-modal-name {
+    font-weight: 600;
+    font-size: 16px;
+    margin: 12px 0 0;
+}
+.bftl-qr-modal-close {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: #555;
+}
+
 @media print {
     #adminmenumain, #wpadminbar, #wpfooter {
         display: none !important;
@@ -31,6 +126,9 @@
     }
     .bftl-qr-grid {
         grid-template-columns: repeat(4, 1fr);
+    }
+    .bftl-qr-item-actions, .bftl-qr-modal {
+        display: none !important;
     }
 }
 
