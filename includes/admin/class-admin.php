@@ -247,14 +247,28 @@ class Beer_Festival_Admin {
             <p><?php _e('Print this page (Ctrl+P) to prepare QR codes for every beer ahead of the festival.', 'beer-festival-tap'); ?></p>
             <p>
                 <input type="search" id="bftl-qr-search" placeholder="<?php esc_attr_e('Search by beer name…', 'beer-festival-tap'); ?>" style="width: 300px;">
+                <select id="bftl-qr-category-filter">
+                    <option value=""><?php _e('All categories', 'beer-festival-tap'); ?></option>
+                    <?php foreach (Beer_Festival_Categories::get_all() as $filter_category): ?>
+                    <option value="<?php echo esc_attr($filter_category); ?>"><?php echo esc_html($filter_category); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </p>
             <div class="bftl-qr-grid">
-                <?php foreach ($beers as $beer): ?>
-                <div class="bftl-qr-item" data-permalink="<?php echo esc_attr($this->get_stable_beer_url($beer->ID)); ?>">
-                    <div class="bftl-qr-item-code"></div>
+                <?php foreach ($beers as $beer):
+                    $brewer = get_post_meta($beer->ID, '_beer_brewer', true);
+                    $category = get_post_meta($beer->ID, '_beer_category', true);
+                ?>
+                <div class="bftl-qr-item" data-permalink="<?php echo esc_attr($this->get_stable_beer_url($beer->ID)); ?>" data-brewer="<?php echo esc_attr($brewer); ?>" data-category="<?php echo esc_attr($category); ?>">
+                    <?php if ($category): ?>
+                    <p class="bftl-qr-item-category"><?php echo esc_html($category); ?></p>
+                    <?php endif; ?>
+                    <div class="bftl-qr-item-code bftl-qr-item-code-clickable" role="button" tabindex="0" aria-label="<?php esc_attr_e('Preview QR code', 'beer-festival-tap'); ?>"></div>
                     <p class="bftl-qr-item-name"><?php echo esc_html($beer->post_title); ?></p>
+                    <?php if ($brewer): ?>
+                    <p class="bftl-qr-item-brewer"><?php echo esc_html($brewer); ?></p>
+                    <?php endif; ?>
                     <div class="bftl-qr-item-actions">
-                        <button type="button" class="button bftl-qr-preview"><?php _e('Preview', 'beer-festival-tap'); ?></button>
                         <button type="button" class="button bftl-qr-download"><?php _e('Download', 'beer-festival-tap'); ?></button>
                         <button type="button" class="button bftl-qr-print"><?php _e('Print', 'beer-festival-tap'); ?></button>
                     </div>
@@ -266,8 +280,10 @@ class Beer_Festival_Admin {
                 <div class="bftl-qr-modal-backdrop"></div>
                 <div class="bftl-qr-modal-content">
                     <button type="button" class="bftl-qr-modal-close" aria-label="<?php esc_attr_e('Close', 'beer-festival-tap'); ?>">&times;</button>
+                    <p class="bftl-qr-modal-category"></p>
                     <div class="bftl-qr-modal-code"></div>
                     <p class="bftl-qr-modal-name"></p>
+                    <p class="bftl-qr-modal-brewer"></p>
                 </div>
             </div>
         </div>
@@ -289,7 +305,7 @@ class Beer_Festival_Admin {
                 <div class="notice notice-error"><p><?php echo esc_html($error); ?></p></div>
             <?php endif; ?>
 
-            <table class="widefat" style="max-width: 500px;">
+            <table class="widefat" style="max-width: 600px;">
                 <thead>
                     <tr>
                         <th><?php _e('Category', 'beer-festival-tap'); ?></th>
@@ -302,19 +318,21 @@ class Beer_Festival_Admin {
                         <td><?php echo esc_html($category); ?></td>
                         <td>
                             <?php if ($category !== Beer_Festival_Categories::DEFAULT_CATEGORY): ?>
-                            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline-block; margin-right: 6px;">
-                                <?php wp_nonce_field('bftl_rename_category'); ?>
-                                <input type="hidden" name="action" value="bftl_rename_category">
-                                <input type="hidden" name="old_name" value="<?php echo esc_attr($category); ?>">
-                                <input type="text" name="new_name" value="<?php echo esc_attr($category); ?>" style="width: 140px;">
-                                <button type="submit" class="button"><?php _e('Rename', 'beer-festival-tap'); ?></button>
-                            </form>
-                            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline-block;" onsubmit="return confirm('<?php echo esc_js(__('Delete this category?', 'beer-festival-tap')); ?>');">
-                                <?php wp_nonce_field('bftl_delete_category'); ?>
-                                <input type="hidden" name="action" value="bftl_delete_category">
-                                <input type="hidden" name="name" value="<?php echo esc_attr($category); ?>">
-                                <button type="submit" class="button button-link-delete"><?php _e('Delete', 'beer-festival-tap'); ?></button>
-                            </form>
+                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: nowrap;">
+                                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:flex; align-items:center; gap: 6px;">
+                                    <?php wp_nonce_field('bftl_rename_category'); ?>
+                                    <input type="hidden" name="action" value="bftl_rename_category">
+                                    <input type="hidden" name="old_name" value="<?php echo esc_attr($category); ?>">
+                                    <input type="text" name="new_name" value="<?php echo esc_attr($category); ?>" style="width: 140px;">
+                                    <button type="submit" class="button"><?php _e('Rename', 'beer-festival-tap'); ?></button>
+                                </form>
+                                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" onsubmit="return confirm('<?php echo esc_js(__('Delete this category?', 'beer-festival-tap')); ?>');">
+                                    <?php wp_nonce_field('bftl_delete_category'); ?>
+                                    <input type="hidden" name="action" value="bftl_delete_category">
+                                    <input type="hidden" name="name" value="<?php echo esc_attr($category); ?>">
+                                    <button type="submit" class="button button-link-delete"><?php _e('Delete', 'beer-festival-tap'); ?></button>
+                                </form>
+                            </div>
                             <?php else: ?>
                                 <em><?php _e('Protected', 'beer-festival-tap'); ?></em>
                             <?php endif; ?>

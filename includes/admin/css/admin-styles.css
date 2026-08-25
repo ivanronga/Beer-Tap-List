@@ -46,9 +46,31 @@
     max-width: 100%;
     height: auto;
 }
+.bftl-qr-item-code-clickable {
+    cursor: pointer;
+}
+.bftl-qr-item-code-clickable:hover,
+.bftl-qr-item-code-clickable:focus-visible {
+    opacity: 0.75;
+    outline: none;
+}
+.bftl-qr-item-category {
+    color: #555;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 0 0 6px;
+}
 .bftl-qr-item-name {
     font-weight: 600;
     margin: 8px 0 0;
+    word-break: break-word;
+}
+.bftl-qr-item-brewer {
+    color: #666;
+    font-size: 12px;
+    margin: 2px 0 0;
     word-break: break-word;
 }
 .bftl-qr-item-actions {
@@ -100,10 +122,23 @@
     max-width: 100%;
     height: auto;
 }
+.bftl-qr-modal-category {
+    color: #555;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 0 0 6px;
+}
 .bftl-qr-modal-name {
     font-weight: 600;
     font-size: 16px;
     margin: 12px 0 0;
+}
+.bftl-qr-modal-brewer {
+    color: #666;
+    font-size: 13px;
+    margin: 2px 0 0;
 }
 .bftl-qr-modal-close {
     position: absolute;
