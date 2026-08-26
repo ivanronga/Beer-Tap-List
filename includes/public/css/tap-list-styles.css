@@ -170,6 +170,7 @@
 }.tap-item--inner.is-beer-style{
   color:var(--bg-color);
   font-size:13px;
+  min-width:0;
 }.tap-item--inner.abv,.tap-item--inner.ibu,.tap-item--inner.is-tap-number{
   font-weight:var(--type-weight-extrabold);
   text-align:center;
@@ -202,10 +203,18 @@
   }
   .tap-item--inner.brewer-name{
     background-color:#22252d;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
   .tap-item--inner.brewer-location{
     background-color:#22252d;
     border-left:1px solid #919296;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
   .tap-item--inner.ibu,.tap-item--inner.abv{
     background-color:#22252d;
@@ -222,9 +231,14 @@
     background-color:transparent !important;
   }
 
-  .tap-item--inner.beer-name,.tap-item--inner.brewer-location,.tap-item--inner.brewer-name,.tap-item--inner.is-beer-style{
+  .tap-item--inner.is-beer-style{
     align-items:center;
     display:flex;
+    height:100%;
+    text-align:left;
+  }
+
+  .tap-item--inner.beer-name,.tap-item--inner.brewer-location,.tap-item--inner.brewer-name{
     height:100%;
     text-align:left;
   }
@@ -243,6 +257,8 @@
     grid-auto-rows:minmax(48px, auto);
     grid-template-areas:"is-tap-number beer-name is-beer-style brewer-name brewer-location ibu abv";
     grid-template-columns:var(--side-w) 2fr 1.2fr 1.4fr 1fr var(--stat-w) var(--stat-w);
+    min-height:0;
+    overflow:hidden;
   }
   .tap-item--inner.abv,.tap-item--inner.ibu,.tap-item--inner.is-tap-number{
     align-items:center;
@@ -253,6 +269,13 @@
 
   .tap-item--inner.beer-name,.tap-item--inner.brewer-location,.tap-item--inner.brewer-name,.tap-item--inner.is-beer-style{
     text-align:left;
+  }
+
+  .tap-item--inner.brewer-name,.tap-item--inner.brewer-location{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
 }.tap-item--inner.beer-name{
   overflow:hidden;
@@ -302,35 +325,39 @@
   font-weight:var(--type-weight-extrabold);
 }.beer-style{
   color:#fbb040;
-
   font-family:var(--ff-sans);
+  max-width:100%;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }@media (max-width:600px){.new-indicator{
 	font-size:14px
 }
   }@media (max-width:600px){.beer-style{
-    align-items:center;
     background-color:#fbb040;
     border-radius:50px;
     color:#000 !important;
-    display:inline-flex;
+    display:inline-block;
     font-size:12px;
     opacity:1;
     padding:6px 12px;
+    text-align:center;
     text-transform:uppercase
 }
   }@media (min-width:601px){.new-indicator{
     font-size:26px
 }
   }@media (min-width:601px){.beer-style{
-    align-items:center;
     background-color:#fbb040;
     border-radius:50px;
     color:#000 !important;
-    display:inline-flex;
+    display:inline-block;
     font-family:var(--ff-no);
     letter-spacing:-.05em;
     opacity:1;
-    padding:var(--unit) calc(var(--unit)*3) 0 calc(var(--unit)*3);
+    padding:calc(var(--unit)/2) calc(var(--unit)*3);
+    text-align:center;
     text-transform:uppercase
 }
   }.tap-number[data-category="NEIPA/Hazy"]{background-color:#ff8c27;color:#fff;}
