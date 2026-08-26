@@ -1,6 +1,6 @@
 
 
-@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Slab:wght@400;700;900&display=swap");:root{
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800;900&display=swap");:root{
     --unit:4px;
     --radius-full:1000px;
     --radius-base:4px;
@@ -11,7 +11,6 @@
     --bg-color:#22252d;
     --color-primary:#207420;
     --color-secondary:#ea7d00;
-    --color-empty:#c0392b;
     --color-text:#fff;
 
     --type-xtiny:11px;
@@ -29,9 +28,10 @@
 	--type-weight-regular:400;
 	--type-weight-semibold:600;
 	--type-weight-bold:700;
-	--ff-sans:"Roboto Slab", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif, Helvetica, Arial, sans-serif;
+	--type-weight-extrabold:800;
+	--ff-sans:"Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif, Helvetica, Arial, sans-serif;
 
-	--ff-no:"Bebas Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif, Helvetica, Arial, sans-serif;
+	--ff-no:"Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif, Helvetica, Arial, sans-serif;
 }*,:after,:before{
     box-sizing:inherit;
 }html{
@@ -163,15 +163,16 @@
     }.tap-item--inner{
   background:var(--bg-color);
   border-radius:0;
+  font-family:var(--ff-sans);
   font-size:14px;
   padding:6px 8px;
 }.tap-item--inner.beer-name{
-  font-weight:600;
+  font-weight:var(--type-weight-extrabold);
 }.tap-item--inner.is-beer-style{
   color:var(--bg-color);
   font-size:13px;
 }.tap-item--inner.abv,.tap-item--inner.ibu,.tap-item--inner.is-tap-number{
-  font-weight:400;
+  font-weight:var(--type-weight-extrabold);
   text-align:center;
 }.tap-item--inner.is-tap-number{ grid-area:is-tap-number; justify-content:center; }.tap-item--inner.beer-name{ grid-area:beer-name; }.tap-item--inner.is-beer-style{ grid-area:is-beer-style; }.tap-item--inner.brewer-name{ grid-area:brewer-name; }.tap-item--inner.brewer-location{ grid-area:brewer-location; }.tap-item--inner.ibu{ grid-area:ibu; }.tap-item--inner.abv{ grid-area:abv; }@media (max-width:600px){
   .tap-item--inner.abv,.tap-item--inner.beer-name,.tap-item--inner.brewer-location,.tap-item--inner.brewer-name,.tap-item--inner.ibu{ font-size:18px; }
@@ -203,7 +204,10 @@
     grid-template-columns:var(--side-w) 2fr 1.2fr 1.4fr 1fr var(--stat-w) var(--stat-w);
   }
   .tap-item--inner.abv,.tap-item--inner.ibu,.tap-item--inner.is-tap-number{
+    align-items:center;
     align-self:center;
+    display:flex;
+    justify-content:center;
   }
 
   .tap-item--inner.beer-name,.tap-item--inner.brewer-location,.tap-item--inner.brewer-name,.tap-item--inner.is-beer-style{
@@ -220,6 +224,7 @@
   display:block;
   font-family:var(--ff-no);
   font-size:3.5vh;
+  font-weight:var(--type-weight-bold);
   height:4vh;
   line-height:4.5vh;
   text-align:center;
@@ -231,14 +236,25 @@
     line-height:36px;
     width:36px
 }
+  }@media (min-width:601px){.tap-number{
+    border:3px solid #fff;
+    font-size:26px;
+    height:42px;
+    line-height:36px;
+    width:42px
+}
   }.abv,.beer-style,.brewer-location,.brewer-name,.ibu{
-  font-size:3vh;
+  font-size:26px;
+}.beer-style,.ibu,.abv{
+  font-weight:var(--type-weight-extrabold);
+}.brewer-name,.brewer-location{
+  font-weight:var(--type-weight-bold);
 }.beer-name{
-  font-size:2.75vh;
-  font-weight:700;
+  font-size:32px;
+  font-weight:var(--type-weight-extrabold);
 }.beer-style{
   color:#fbb040;
-  
+
   font-family:var(--ff-sans);
 }@media (max-width:600px){.beer-style{
 	font-size:18px
@@ -248,13 +264,35 @@
     background-color:#fbb040;
     border-radius:50px;
     color:#000 !important;
-    display:inline-flex; 
+    display:inline-flex;
     font-family:var(--ff-no);
-    letter-spacing:.01em;
+    letter-spacing:-.05em;
     opacity:1;
     padding:var(--unit) calc(var(--unit)*3) 0 calc(var(--unit)*3);
     text-transform:uppercase
 }
+  }.tap-number[data-category="NEIPA/Hazy"]{background-color:#ff8c27;color:#fff;}
+  .tap-number[data-category="IPA"]{background-color:#c01717;color:#fff;}
+  .tap-number[data-category="Lager"]{background-color:#ffcc00;color:#000;}
+  .tap-number[data-category="Pale Ale"]{background-color:#ae5100;color:#fff;}
+  .tap-number[data-category="Dark"]{background-color:#000;color:#fff;}
+  .tap-number[data-category="Sour"]{background-color:#d400ff;color:#fff;}
+  .tap-number[data-category="Special"]{background-color:#07c9ff;color:#000;}
+  .beer-style[data-category="NEIPA/Hazy"]{color:#ff8c27;}
+  .beer-style[data-category="IPA"]{color:#c01717;}
+  .beer-style[data-category="Lager"]{color:#ffcc00;}
+  .beer-style[data-category="Pale Ale"]{color:#ae5100;}
+  .beer-style[data-category="Dark"]{color:#fff;}
+  .beer-style[data-category="Sour"]{color:#d400ff;}
+  .beer-style[data-category="Special"]{color:#07c9ff;}
+  @media (min-width:601px){
+    .beer-style[data-category="NEIPA/Hazy"]{background-color:#ff8c27;color:#fff !important;}
+    .beer-style[data-category="IPA"]{background-color:#c01717;color:#fff !important;}
+    .beer-style[data-category="Lager"]{background-color:#ffcc00;color:#000 !important;}
+    .beer-style[data-category="Pale Ale"]{background-color:#ae5100;color:#fff !important;}
+    .beer-style[data-category="Dark"]{background-color:#fff;color:#22252d !important;}
+    .beer-style[data-category="Sour"]{background-color:#d400ff;color:#fff !important;}
+    .beer-style[data-category="Special"]{background-color:#07c9ff;color:#000 !important;}
   }.abv{
   justify-content:flex-end;
 }@media (min-width:601px){
@@ -262,17 +300,26 @@
       display:inline-block;
       width:80px;
     }
+    .ibu span{
+      display:inline-block;
+      width:50px;
+    }
   }@media (max-width:600px){.empty-tap{
     grid-column:2 /  6;
     width:100%
 }
-  }.empty-tap--inner{
-  background-color:var(--color-empty);
-  font-size:3vh;
-}.empty-tap--inner,.new-indicator{
+  }.empty-tap--inner,.new-indicator{
   border-radius:50px;
   font-family:var(--ff-no);
   padding:var(--unit) calc(var(--unit)*3) 0 calc(var(--unit)*3);
+}.empty-tap--inner{
+  align-items:center;
+  background-color:red;
+  display:flex;
+  font-size:24px;
+  font-weight:var(--type-weight-bold);
+  justify-content:center;
+  padding:8px 12px;
 }.new-indicator{
   align-items:center;
   align-self:center;
@@ -282,7 +329,7 @@
   display:inline-flex;
   font-size:1.5vh;
   font-size:3.5vh;
-  font-weight:400;
+  font-weight:var(--type-weight-extrabold);
   letter-spacing:.01em;
   margin-left:calc(var(--unit)*2);
   opacity:1;

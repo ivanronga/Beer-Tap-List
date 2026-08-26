@@ -146,9 +146,11 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
                 $is_new = (time() - $tapped_timestamp) < $new_duration;
             }
     
+            $category = $beer ? get_post_meta($beer->ID, '_beer_category', true) : '';
+
             $tap_list_html .= '<div class="tap-item'.($is_new ? ' new-beer' : '').'" id="tap-'.$tap_id.'">';
-            $tap_list_html .= '<div class="tap-item--inner is-tap-number"><div class="tap-number">' . esc_html($tap_id) . '</div></div>';
-            
+            $tap_list_html .= '<div class="tap-item--inner is-tap-number"><div class="tap-number" data-category="' . esc_attr($category) . '">' . esc_html($tap_id) . '</div></div>';
+
             if ($beer) {
                 $tap_list_html .= '<div class="tap-item--inner beer-name">' . esc_html($beer->post_title);
 
@@ -157,11 +159,11 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
                 }
 
                 $tap_list_html .= '</div>';
-                
-                $tap_list_html .= '<div class="tap-item--inner is-beer-style"><div class="beer-style">' . esc_html(get_post_meta($beer->ID, '_beer_stil', true)) . '</div></div>';
+
+                $tap_list_html .= '<div class="tap-item--inner is-beer-style"><div class="beer-style" data-category="' . esc_attr($category) . '">' . esc_html(get_post_meta($beer->ID, '_beer_stil', true)) . '</div></div>';
                 $tap_list_html .= '<div class="tap-item--inner brewer-name">' . esc_html(get_post_meta($beer->ID, '_beer_brewer', true)) . '</div>';
                 $tap_list_html .= '<div class="tap-item--inner brewer-location">' . esc_html(get_post_meta($beer->ID, '_beer_location', true)) . '</div>';
-                $tap_list_html .= '<div class="tap-item--inner ibu"><i class="icon icon--hops"></i> ' . esc_html(get_post_meta($beer->ID, '_beer_ibu', true)) . '</div>';
+                $tap_list_html .= '<div class="tap-item--inner ibu"><i class="icon icon--hops"></i> <span class="ibu--inner">' . esc_html(get_post_meta($beer->ID, '_beer_ibu', true)) . '</span></div>';
                 $tap_list_html .= '<div class="tap-item--inner abv"><i class="icon icon--flask"></i> <span>' . esc_html(get_post_meta($beer->ID, '_beer_abv', true)) . '%</span></div>';
             } else {
                 $tap_list_html .= '<div class="tap-item--inner beer-details empty-tap"><div class="empty-tap--inner">No beer assigned</div></div>';
