@@ -140,7 +140,7 @@
   --bg:#fbfbfb;
   --bg-color:var(--bg);
   --row-bg:#22252d;
-  --row-alt-bg:#393b42;
+  --row-highlight-bg:rgba(255,255,255,.15);
 }.bftl-tap-list{
   width:100%;
 }@media screen and (min-width:601px){.bftl-tap-list{
@@ -156,12 +156,11 @@
   border-bottom:1px solid hsla(0,0%,100%,.5);
   display:grid;
   gap:var(--gutter);
-}.tap-item .tap-item--inner{
-	background-color:var(--row-bg);
-  }.tap-item:nth-of-type(2n),.tap-item:nth-of-type(2n) .tap-item--inner{
-      background-color:var(--row-alt-bg);
+}.tap-item[data-band="1"]{
+      background-color:var(--row-highlight-bg);
+    }.tap-item[data-band="0"]{
+      background-color:transparent;
     }.tap-item--inner{
-  background:var(--bg-color);
   border-radius:0;
   font-family:var(--ff-sans);
   font-size:14px;
@@ -175,16 +174,57 @@
   font-weight:var(--type-weight-extrabold);
   text-align:center;
 }.tap-item--inner.is-tap-number{ grid-area:is-tap-number; justify-content:center; }.tap-item--inner.beer-name{ grid-area:beer-name; }.tap-item--inner.is-beer-style{ grid-area:is-beer-style; }.tap-item--inner.brewer-name{ grid-area:brewer-name; }.tap-item--inner.brewer-location{ grid-area:brewer-location; }.tap-item--inner.ibu{ grid-area:ibu; }.tap-item--inner.abv{ grid-area:abv; }@media (max-width:600px){
-  .tap-item--inner.abv,.tap-item--inner.beer-name,.tap-item--inner.brewer-location,.tap-item--inner.brewer-name,.tap-item--inner.ibu{ font-size:18px; }
+  .tap-item--inner.brewer-name,.tap-item--inner.brewer-location{ font-size:14px; font-weight:var(--type-weight-semibold); }
+  .tap-item--inner.beer-name,.tap-item--inner.abv,.tap-item--inner.ibu{ font-size:16px; }
   .tap-item{
+    border-bottom:3px solid #919296;
     grid-template-areas:"is-tap-number beer-name      beer-name        ibu  abv" "is-tap-number is-beer-style  is-beer-style    ibu  abv" "is-tap-number brewer-name    brewer-location  ibu  abv";
-    grid-template-columns:var(--side-w) 3fr 3fr 60px 60px;
+    grid-template-columns:43px 162px 1fr 51px 51px;
   }
 
   .tap-item--inner{
-    border:1px solid hsla(0,0%,100%,.5);
+    border:none;
+    padding:12px;
   }
+  .tap-item--inner.is-tap-number{
+    border-right:1px solid #919296;
+  }
+  .tap-item--inner.beer-name{
+    background-color:#22252d;
+    border-bottom:1px solid #96979b;
+    padding:12px 24px;
+  }
+  .tap-item--inner.is-beer-style{
+    background-color:#22252d;
+    border-bottom:1px solid #919296;
+    height:49px;
+    padding:12px 24px;
+  }
+  .tap-item--inner.brewer-name{
+    background-color:#22252d;
+  }
+  .tap-item--inner.brewer-location{
+    background-color:#22252d;
+    border-left:1px solid #919296;
+  }
+  .tap-item--inner.ibu,.tap-item--inner.abv{
+    background-color:#22252d;
+    border-left:1px solid #919296;
+    gap:10px;
+    padding:12px 6px;
+  }
+  .tap-item.new-beer .tap-item--inner.beer-name,
+  .tap-item.new-beer .tap-item--inner.is-beer-style,
+  .tap-item.new-beer .tap-item--inner.brewer-name,
+  .tap-item.new-beer .tap-item--inner.brewer-location,
+  .tap-item.new-beer .tap-item--inner.ibu,
+  .tap-item.new-beer .tap-item--inner.abv{
+    background-color:transparent !important;
+  }
+
   .tap-item--inner.beer-name,.tap-item--inner.brewer-location,.tap-item--inner.brewer-name,.tap-item--inner.is-beer-style{
+    align-items:center;
+    display:flex;
     height:100%;
     text-align:left;
   }
@@ -196,6 +236,7 @@
     height:100%;
     justify-content:center;
   }
+
 }@media (min-width:601px){
   .tap-item{
     align-items:center;
@@ -230,11 +271,18 @@
   text-align:center;
   width:4vh;
 }@media (max-width:600px){.tap-number{
-    font-family:var(--ff-sans);
-    font-size:18px;
-    height:36px;
-    line-height:36px;
-    width:36px
+    align-items:center;
+    background-color:transparent !important;
+    border-radius:0;
+    display:flex;
+    font-size:16px;
+    height:100%;
+    justify-content:center;
+    line-height:normal;
+    width:100%
+}
+  }@media (max-width:600px){.tap-item--inner.is-tap-number{
+    background-color:#fbb040
 }
   }@media (min-width:601px){.tap-number{
     border:3px solid #fff;
@@ -256,8 +304,22 @@
   color:#fbb040;
 
   font-family:var(--ff-sans);
-}@media (max-width:600px){.beer-style{
-	font-size:18px
+}@media (max-width:600px){.new-indicator{
+	font-size:14px
+}
+  }@media (max-width:600px){.beer-style{
+    align-items:center;
+    background-color:#fbb040;
+    border-radius:50px;
+    color:#000 !important;
+    display:inline-flex;
+    font-size:12px;
+    opacity:1;
+    padding:6px 12px;
+    text-transform:uppercase
+}
+  }@media (min-width:601px){.new-indicator{
+    font-size:26px
 }
   }@media (min-width:601px){.beer-style{
     align-items:center;
@@ -278,6 +340,15 @@
   .tap-number[data-category="Dark"]{background-color:#000;color:#fff;}
   .tap-number[data-category="Sour"]{background-color:#d400ff;color:#fff;}
   .tap-number[data-category="Special"]{background-color:#07c9ff;color:#000;}
+  @media (max-width:600px){
+    .tap-item--inner.is-tap-number[data-category="NEIPA/Hazy"]{background-color:#ff8c27;}
+    .tap-item--inner.is-tap-number[data-category="IPA"]{background-color:#c01717;}
+    .tap-item--inner.is-tap-number[data-category="Lager"]{background-color:#ffcc00;}
+    .tap-item--inner.is-tap-number[data-category="Pale Ale"]{background-color:#ae5100;}
+    .tap-item--inner.is-tap-number[data-category="Dark"]{background-color:#000;}
+    .tap-item--inner.is-tap-number[data-category="Sour"]{background-color:#d400ff;}
+    .tap-item--inner.is-tap-number[data-category="Special"]{background-color:#07c9ff;}
+  }
   .beer-style[data-category="NEIPA/Hazy"]{color:#ff8c27;}
   .beer-style[data-category="IPA"]{color:#c01717;}
   .beer-style[data-category="Lager"]{color:#ffcc00;}
@@ -286,6 +357,14 @@
   .beer-style[data-category="Sour"]{color:#d400ff;}
   .beer-style[data-category="Special"]{color:#07c9ff;}
   @media (min-width:601px){
+    .beer-style[data-category="NEIPA/Hazy"]{background-color:#ff8c27;color:#fff !important;}
+    .beer-style[data-category="IPA"]{background-color:#c01717;color:#fff !important;}
+    .beer-style[data-category="Lager"]{background-color:#ffcc00;color:#000 !important;}
+    .beer-style[data-category="Pale Ale"]{background-color:#ae5100;color:#fff !important;}
+    .beer-style[data-category="Dark"]{background-color:#fff;color:#22252d !important;}
+    .beer-style[data-category="Sour"]{background-color:#d400ff;color:#fff !important;}
+    .beer-style[data-category="Special"]{background-color:#07c9ff;color:#000 !important;}
+  }@media (max-width:600px){
     .beer-style[data-category="NEIPA/Hazy"]{background-color:#ff8c27;color:#fff !important;}
     .beer-style[data-category="IPA"]{background-color:#c01717;color:#fff !important;}
     .beer-style[data-category="Lager"]{background-color:#ffcc00;color:#000 !important;}
@@ -320,22 +399,25 @@
   font-weight:var(--type-weight-bold);
   justify-content:center;
   padding:8px 12px;
-}.new-indicator{
+}@media (max-width:600px){.empty-tap--inner{
+    font-size:12px;
+    padding:6px 12px;
+    text-transform:uppercase
+}
+  }.new-indicator{
   align-items:center;
   align-self:center;
   animation:blink 2s ease-in-out infinite;
-  background-color:#fff;
-  color:var(--color-primary) !important;
+  background-color:#fbb040;
+  color:#000 !important;
   display:inline-flex;
-  font-size:1.5vh;
-  font-size:3.5vh;
   font-weight:var(--type-weight-extrabold);
   letter-spacing:.01em;
   margin-left:calc(var(--unit)*2);
   opacity:1;
   text-transform:uppercase;
-}.tap-item.new-beer,.tap-item.new-beer .tap-item--inner{
-  background-color:var(--color-primary) !important;
+}.tap-item.new-beer{
+  background:radial-gradient(200% 200% at 7% 0%, rgba(29,189,125,1) 0%, rgba(21,138,91,1) 50%, rgba(13,87,57,1) 100%) !important;
 }@keyframes blink{
   0%,to{ opacity:1; }
   50%{ opacity:0; }
@@ -351,7 +433,10 @@
     vertical-align:top; 
     width:3vh;
 }@media (max-width:600px){.icon{
-        margin-right:0
+        background-size:24px;
+        height:24px;
+        margin-right:0;
+        width:24px
 }
     }.icon--hops{
         background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' fill='%236dda5c' viewBox='0 0 48 48'%3E%3Cpath d='M18.7 30.4c1.5 2.9 4.1 5.4 4.8 5.4s3.2-2.5 4.8-5.4c-1.4-.8-2.7-1.8-3.6-3.1 0 0 0-.1-.1-.1-.4.2-.8.3-1.1.3s-.7-.1-1.1-.3c0 0 0 .1-.1.1-1 1.3-2.2 2.3-3.6 3.1M24.9 9V3.6c0-.8-.7-1.5-1.5-1.5s-1.5.7-1.5 1.5V9c-5.4.6-12.3 4.4-12.5 11.9 1 .3 4.3.3 7.3-1.6l1-.6.5 1.1c1.2 2.6 4.3 5.4 5.2 5.6.9-.2 4-3 5.2-5.6l.5-1.1 1 .6c3 1.8 6.4 1.9 7.3 1.6-.2-7.5-7.1-11.3-12.5-11.9'/%3E%3Cpath d='M30 21.7c-.9 1.5-2.3 3.2-3.7 4.4 0 0 0 .1.1.1 2 2.9 7.3 4.3 9.1 4.3.3 0 .4 0 .5-.1.5-.3 1.3-4 .8-7.2h-.7c-1.8 0-4-.5-6.1-1.5M11.4 30.4c1.8 0 7.1-1.4 9.1-4.3 0 0 0-.1.1-.1-1.4-1.2-2.8-2.8-3.7-4.4-2.1 1-4.3 1.5-6 1.5h-.7c-.5 3.2.3 6.9.8 7.2 0 .1.1.1.4.1M15.3 38.5q.15 0 0 0c.7 0 2.7-1.1 4.6-2.8-1.4-1.5-2.6-3.4-3.1-4.4v-.1c-1.7.7-3.3 1.1-4.5 1.2.7 3.1 2.5 6 3 6.1M31.4 38.5s.1 0 0 0c.6-.2 2.4-3 3.1-6.1-1.2-.1-2.8-.5-4.5-1.2v.1c-.5 1-1.7 2.9-3.1 4.4 1.8 1.7 3.9 2.8 4.5 2.8M25.5 37.3l-.2-.1c-.7.5-1.3.8-1.9.8s-1.3-.3-1.9-.8l-.2.1c-.6.6-1.6 1.4-2.7 2.1 1.4 3 4.2 5.8 4.8 5.8s3.4-2.7 4.8-5.8c-1.1-.7-2.1-1.5-2.7-2.1'/%3E%3C/svg%3E");

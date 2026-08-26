@@ -135,22 +135,32 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
     
         ob_start();
         $tap_list_html = '<div class="bftl-tap-list" style="--tap-rows: ' . intval($num_taps) . ';">';
-        
+
+        // Row banding follows zone-category groups (all taps in the same zone share
+        // a band), not individual rows -- flips only when the zone category changes.
+        $prev_zone_category = null;
+        $band_highlight = true;
+
         for ($tap_id = 1; $tap_id <= $num_taps; $tap_id++) {
             $tap = isset($tap_map[$tap_id]) ? $tap_map[$tap_id] : null;
             $beer = ($tap && $tap->beer_id && isset($beers[$tap->beer_id])) ? $beers[$tap->beer_id] : null;
             $is_new = false;
-            
+
             if ($beer && $tap && $tap->tapped_time) {
                 $tapped_timestamp = strtotime($tap->tapped_time);
                 $is_new = (time() - $tapped_timestamp) < $new_duration;
             }
-    
+
             $category = $beer ? get_post_meta($beer->ID, '_beer_category', true) : '';
             $zone_category = $tap ? $tap->category : '';
 
-            $tap_list_html .= '<div class="tap-item'.($is_new ? ' new-beer' : '').'" id="tap-'.$tap_id.'">';
-            $tap_list_html .= '<div class="tap-item--inner is-tap-number"><div class="tap-number" data-category="' . esc_attr($zone_category) . '">' . esc_html($tap_id) . '</div></div>';
+            if ($prev_zone_category !== null && $zone_category !== $prev_zone_category) {
+                $band_highlight = !$band_highlight;
+            }
+            $prev_zone_category = $zone_category;
+
+            $tap_list_html .= '<div class="tap-item'.($is_new ? ' new-beer' : '').'" data-band="' . ($band_highlight ? '1' : '0') . '" id="tap-'.$tap_id.'">';
+            $tap_list_html .= '<div class="tap-item--inner is-tap-number" data-category="' . esc_attr($zone_category) . '"><div class="tap-number" data-category="' . esc_attr($zone_category) . '">' . esc_html($tap_id) . '</div></div>';
 
             if ($beer) {
                 $tap_list_html .= '<div class="tap-item--inner beer-name">' . esc_html($beer->post_title);
