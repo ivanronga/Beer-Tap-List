@@ -134,7 +134,7 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
         }
     
         ob_start();
-        $tap_list_html = '<div class="bftl-tap-list">';
+        $tap_list_html = '<div class="bftl-tap-list" style="--tap-rows: ' . intval($num_taps) . ';">';
         
         for ($tap_id = 1; $tap_id <= $num_taps; $tap_id++) {
             $tap = isset($tap_map[$tap_id]) ? $tap_map[$tap_id] : null;

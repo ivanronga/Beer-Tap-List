@@ -11,6 +11,7 @@
     --bg-color:#22252d;
     --color-primary:#207420;
     --color-secondary:#ea7d00;
+    --color-empty:#c0392b;
     --color-text:#fff;
 
     --type-xtiny:11px;
@@ -142,11 +143,11 @@
   --row-alt-bg:#393b42;
 }.bftl-tap-list{
   width:100%;
-}@media screen and (min-width:782px){.bftl-tap-list{
+}@media screen and (min-width:601px){.bftl-tap-list{
     display:grid;
     gap:0;
     grid-template-columns:repeat(1, 1fr);
-    grid-template-rows:repeat(16, 6.25vh);
+    grid-template-rows:repeat(var(--tap-rows, 16), 1fr);
     height:100vh
 }
   }.tap-item{
@@ -266,7 +267,7 @@
     width:100%
 }
   }.empty-tap--inner{
-  background-color:red;
+  background-color:var(--color-empty);
   font-size:3vh;
 }.empty-tap--inner,.new-indicator{
   border-radius:50px;
