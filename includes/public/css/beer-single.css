@@ -1,44 +1,318 @@
-.bftl-beer-single-wrapper {
-    max-width: 640px;
-    margin: 2rem auto;
-    padding: 1.5rem;
-    background-color: #22252d;
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800;900&display=swap");
+
+:root {
+    --bftl-mint: #5eead4;
+    --bftl-warning: #d95252;
+    --bftl-card-dark: #17251f;
+    --bftl-card-light: #234a42;
+}
+
+.bftl-beer-single-body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bftl-card-dark);
+    font-family: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: #fff;
-    border-radius: 8px;
+}
+
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+.bftl-beer-single-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32px 16px;
+}
+
+.bftl-beer-single-card {
+    width: 100%;
+    max-width: 380px;
+    border-radius: 20px;
+    padding: 24px;
+    background: radial-gradient(120% 60% at 50% 0%, var(--bftl-card-light) 0%, var(--bftl-card-dark) 70%);
+}
+
+.bftl-beer-single-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.bftl-beer-single-logo img {
+    height: 32px;
+    width: auto;
+}
+.bftl-beer-single-logo-text {
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: 0.02em;
+}
+
+.bftl-beer-single-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+}
+.bftl-beer-single-banner p {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+.bftl-beer-single-banner.is-warning {
+    background: var(--bftl-warning);
+    color: #fff;
+}
+.bftl-beer-single-banner.is-success {
+    background: var(--bftl-mint);
+    color: #183a34;
+}
+.bftl-beer-single-banner svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.bftl-beer-single-eyebrow {
+    margin: 0 0 4px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
 }
 
 .bftl-beer-single-title {
-    color: #ea7d00;
-    margin-top: 0;
+    margin: 0 0 10px;
+    font-family: inherit;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #fff;
 }
 
-.bftl-beer-single-meta p,
-.bftl-beer-single-status p {
-    margin: 0.4em 0;
-}
-
-.bftl-current-taps {
-    list-style: none;
-    margin: 0.5em 0;
-    padding: 0;
-}
-
-.bftl-current-taps li {
-    margin: 0.4em 0;
-}
-
-.bftl-beer-single-assign {
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.bftl-beer-single-assign label {
-    display: block;
-    margin-bottom: 0.4em;
-}
-
-#bftl-beer-assign-feedback {
-    margin-left: 8px;
+.bftl-beer-single-subline,
+.bftl-beer-single-stats {
+    margin: 0;
+    font-size: 13px;
     font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+}
+.bftl-beer-single-subline {
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+.bftl-beer-single-stats {
+    margin-top: 10px;
+}
+.bftl-beer-single-dot {
+    margin: 0 6px;
+}
+
+.bftl-beer-single-taps {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bftl-tap-block-label {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Confirmed tap badge */
+.bftl-tap-confirmed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+    background-color: #fbb040;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.bftl-tap-remove-btn {
+    width: 100%;
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--bftl-mint);
+    color: var(--bftl-mint);
+    border-radius: 999px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.bftl-tap-remove-btn:hover {
+    background: rgba(94, 234, 212, 0.1);
+}
+
+/* Custom dropdown */
+.bftl-tap-dropdown {
+    position: relative;
+}
+.bftl-tap-dropdown-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    color: #17251f;
+    cursor: pointer;
+}
+.bftl-tap-dropdown-trigger .bftl-tap-dropdown-label {
+    flex: 1;
+    text-align: left;
+    color: #9a9a9a;
+}
+.bftl-tap-dropdown-trigger.has-value .bftl-tap-dropdown-label {
+    color: #17251f;
+}
+.bftl-tap-dropdown-chevron {
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+}
+.bftl-tap-dropdown[data-open] .bftl-tap-dropdown-chevron {
+    transform: rotate(180deg);
+}
+.bftl-tap-dropdown-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: none;
+}
+.bftl-tap-dropdown-trigger.has-value .bftl-tap-dropdown-dot {
+    display: block;
+}
+
+.bftl-tap-dropdown-list {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 20;
+    max-height: 260px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 4px 0;
+    list-style: none;
+    background: var(--bftl-card-dark);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+}
+.bftl-tap-dropdown-list[hidden] {
+    display: none;
+}
+.bftl-tap-dropdown-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+.bftl-tap-dropdown-option:hover,
+.bftl-tap-dropdown-option.is-active {
+    background: rgba(255, 255, 255, 0.08);
+}
+.bftl-tap-dropdown-option .bftl-tap-dropdown-dot {
+    display: block;
+    background-color: #fbb040;
+}
+
+.bftl-tap-cancel-link {
+    display: block;
+    text-align: center;
+    margin: 16px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+}
+.bftl-tap-cancel-link:hover {
+    color: #fff;
+}
+
+.bftl-tap-publish-btn {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--bftl-mint);
+    color: var(--bftl-mint);
+    border-radius: 999px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.bftl-tap-publish-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.bftl-tap-publish-btn:not(:disabled):hover {
+    background: rgba(94, 234, 212, 0.1);
+}
+
+/* Category colors -- shared palette with the tap list */
+.bftl-tap-confirmed[data-category="NEIPA/Hazy"],
+.bftl-tap-dropdown-dot[data-category="NEIPA/Hazy"],
+.bftl-tap-dropdown-option[data-category="NEIPA/Hazy"] .bftl-tap-dropdown-dot { background-color: #ff8c27; }
+.bftl-tap-confirmed[data-category="IPA"],
+.bftl-tap-dropdown-dot[data-category="IPA"],
+.bftl-tap-dropdown-option[data-category="IPA"] .bftl-tap-dropdown-dot { background-color: #c01717; }
+.bftl-tap-confirmed[data-category="Lager"],
+.bftl-tap-dropdown-dot[data-category="Lager"],
+.bftl-tap-dropdown-option[data-category="Lager"] .bftl-tap-dropdown-dot { background-color: #ffcc00; }
+.bftl-tap-confirmed[data-category="Pale Ale"],
+.bftl-tap-dropdown-dot[data-category="Pale Ale"],
+.bftl-tap-dropdown-option[data-category="Pale Ale"] .bftl-tap-dropdown-dot { background-color: #ae5100; }
+.bftl-tap-confirmed[data-category="Dark"],
+.bftl-tap-dropdown-dot[data-category="Dark"],
+.bftl-tap-dropdown-option[data-category="Dark"] .bftl-tap-dropdown-dot { background-color: #000; border: 1px solid rgba(255,255,255,0.4); }
+.bftl-tap-confirmed[data-category="Sour"],
+.bftl-tap-dropdown-dot[data-category="Sour"],
+.bftl-tap-dropdown-option[data-category="Sour"] .bftl-tap-dropdown-dot { background-color: #d400ff; }
+.bftl-tap-confirmed[data-category="Special"],
+.bftl-tap-dropdown-dot[data-category="Special"],
+.bftl-tap-dropdown-option[data-category="Special"] .bftl-tap-dropdown-dot { background-color: #07c9ff; }
+
+.bftl-tap-confirmed[data-category="Lager"],
+.bftl-tap-confirmed[data-category="Special"] {
+    color: #000;
+}
+
+@media (min-width: 601px) {
+    .bftl-beer-single-page {
+        align-items: center;
+    }
 }
