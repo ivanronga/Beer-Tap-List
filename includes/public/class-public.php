@@ -147,9 +147,10 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
             }
     
             $category = $beer ? get_post_meta($beer->ID, '_beer_category', true) : '';
+            $zone_category = $tap ? $tap->category : '';
 
             $tap_list_html .= '<div class="tap-item'.($is_new ? ' new-beer' : '').'" id="tap-'.$tap_id.'">';
-            $tap_list_html .= '<div class="tap-item--inner is-tap-number"><div class="tap-number" data-category="' . esc_attr($category) . '">' . esc_html($tap_id) . '</div></div>';
+            $tap_list_html .= '<div class="tap-item--inner is-tap-number"><div class="tap-number" data-category="' . esc_attr($zone_category) . '">' . esc_html($tap_id) . '</div></div>';
 
             if ($beer) {
                 $tap_list_html .= '<div class="tap-item--inner beer-name">' . esc_html($beer->post_title);
@@ -238,20 +239,23 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
         // Process all taps, including empty ones
         for ($tap_id = 1; $tap_id <= $num_taps; $tap_id++) {
             $tap = isset($tap_map[$tap_id]) ? $tap_map[$tap_id] : null;
-            
+            $zone_category = $tap ? $tap->category : '';
+
             if ($tap && $tap->active && $tap->beer_id) {
                 $beer = get_post($tap->beer_id);
                 if (!$beer) {
                     error_log('Beer not found for tap ' . $tap_id);
                     $data[] = [
                         'tap_id' => $tap_id,
+                        'zone_category' => $zone_category,
                         'is_empty' => true
                     ];
                     continue;
                 }
-                
+
                 $data[] = [
                     'tap_id' => $tap_id,
+                    'zone_category' => $zone_category,
                     'beer_name' => $beer->post_title,
                     'beer_style' => get_post_meta($beer->ID, '_beer_stil', true),
                     'beer_category' => get_post_meta($beer->ID, '_beer_category', true),
@@ -266,6 +270,7 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
                 // Add empty tap data
                 $data[] = [
                     'tap_id' => $tap_id,
+                    'zone_category' => $zone_category,
                     'is_empty' => true
                 ];
             }

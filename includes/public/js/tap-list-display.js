@@ -20,7 +20,7 @@ jQuery(document).ready(function($) {
                                 // Clear all content except tap number
                                 $tap.find('.beer-name, .beer-style, .brewer-name, .brewer-location, .ibu, .abv, .new-indicator').remove();
                                 $tap.removeClass('new-beer');
-                                $tap.find('.tap-number').attr('data-category', '');
+                                $tap.find('.tap-number').attr('data-category', tap.zone_category || '');
 
                                 // Add empty tap message if it doesn't exist
                                 if (!$tap.find('.beer-details.empty-tap').length) {
@@ -47,7 +47,7 @@ jQuery(document).ready(function($) {
                                 $beerName.text(tap.beer_name);
 
                                 // Update beer details
-                                $tap.find('.tap-number').attr('data-category', tap.beer_category || '');
+                                $tap.find('.tap-number').attr('data-category', tap.zone_category || '');
                                 $tap.find('.beer-style').attr('data-category', tap.beer_category || '').text(tap.beer_style);
                                 $tap.find('.brewer-name').text(tap.brewer_name);
                                 $tap.find('.brewer-location').text(tap.brewer_location);
