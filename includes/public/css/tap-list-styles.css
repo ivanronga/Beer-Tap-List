@@ -420,7 +420,7 @@
   padding:var(--unit) calc(var(--unit)*3) 0 calc(var(--unit)*3);
 }.empty-tap--inner{
   align-items:center;
-  background-color:red;
+  color:red;
   display:flex;
   font-size:24px;
   font-weight:var(--type-weight-bold);
