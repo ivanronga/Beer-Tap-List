@@ -12,6 +12,7 @@ class Beer_Festival_Admin {
         add_action('admin_post_bftl_export_csv', [$this, 'handle_export_csv']);
         add_action('admin_post_bftl_import_upload', [$this, 'handle_import_upload']);
         add_action('admin_post_bftl_import_process', [$this, 'handle_import_process']);
+        add_action('admin_post_bftl_delete_all_beers', [$this, 'handle_delete_all_beers']);
     }
 
     public function register_admin_menu() {
@@ -478,6 +479,28 @@ class Beer_Festival_Admin {
             <p><input type="file" name="import_file" accept=".csv,.xls,.xlsx" required></p>
             <p><button type="submit" class="button button-primary"><?php _e('Upload &amp; Continue', 'beer-festival-tap'); ?></button></p>
         </form>
+
+        <hr>
+
+        <?php $this->render_delete_all_beers_section(); ?>
+        <?php
+    }
+
+    private function render_delete_all_beers_section() {
+        $beer_count = wp_count_posts('beer')->publish;
+        $confirm_message = sprintf(
+            /* translators: %d: number of beers */
+            __('Delete all %d beer(s)? They will be moved to Trash and every tap will be cleared. This cannot be undone from this screen.', 'beer-festival-tap'),
+            $beer_count
+        );
+        ?>
+        <h2 style="color: #a00;"><?php _e('Delete All Beers', 'beer-festival-tap'); ?></h2>
+        <p><?php _e('Moves every beer to the Trash and clears every tap currently pouring one. Beers can be restored from the Trash afterward if this was a mistake.', 'beer-festival-tap'); ?></p>
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" onsubmit="return confirm('<?php echo esc_js($confirm_message); ?>');">
+            <?php wp_nonce_field('bftl_delete_all_beers'); ?>
+            <input type="hidden" name="action" value="bftl_delete_all_beers">
+            <p><button type="submit" class="button bftl-button-danger"><?php _e('Delete All Beers', 'beer-festival-tap'); ?></button></p>
+        </form>
         <?php
     }
 
@@ -701,6 +724,43 @@ class Beer_Festival_Admin {
             'import_id' => $import_id,
         ], admin_url('admin.php')));
         exit;
+    }
+
+    public function handle_delete_all_beers() {
+        check_admin_referer('bftl_delete_all_beers');
+        if (!current_user_can('manage_options')) {
+            wp_die(__('Unauthorized', 'beer-festival-tap'));
+        }
+
+        // Clear every tap first so nothing is left pointing at a beer that's about to be trashed.
+        $taps = Tap_Manager::get_all_taps();
+        if (!is_wp_error($taps)) {
+            foreach ($taps as $tap) {
+                if ($tap->beer_id) {
+                    Tap_Manager::clear_tap(intval($tap->tap_id), get_current_user_id());
+                }
+            }
+        }
+
+        $beer_ids = get_posts([
+            'post_type'   => 'beer',
+            'post_status' => 'any',
+            'numberposts' => -1,
+            'fields'      => 'ids',
+        ]);
+
+        $deleted = 0;
+        foreach ($beer_ids as $beer_id) {
+            if (wp_delete_post($beer_id)) { // no force = moves to Trash
+                $deleted++;
+            }
+        }
+
+        $this->redirect_to_import_export(sprintf(
+            /* translators: %d: number of beers deleted */
+            __('%d beer(s) moved to Trash. All taps were cleared.', 'beer-festival-tap'),
+            $deleted
+        ));
     }
 
     public function render_main_page() {

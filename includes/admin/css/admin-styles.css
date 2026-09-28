@@ -184,6 +184,18 @@
     color: #c02b2b;
 }
 
+.button.bftl-button-danger {
+    background-color: #b32d2e;
+    border-color: #8a2323;
+    color: #fff;
+}
+.button.bftl-button-danger:hover,
+.button.bftl-button-danger:focus {
+    background-color: #8a2323;
+    border-color: #6b1a1a;
+    color: #fff;
+}
+
 @media screen and (max-width: 782px) {
     .select2-hidden-accessible {
         width: 100% !important;
