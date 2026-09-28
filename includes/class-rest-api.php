@@ -7,8 +7,6 @@ require_once BEER_FESTIVAL_PLUGIN_DIR . 'includes/class-concurrent-edit.php';
 class Beer_Festival_REST {
 
     const NAMESPACE_ = 'beer-festival-tap-list/v1';
-    const RATE_LIMIT_MAX = 10;
-    const RATE_LIMIT_WINDOW = 300; // 5 minutes
 
     public function __construct() {
         add_action('rest_api_init', [$this, 'register_routes']);
@@ -58,20 +56,6 @@ class Beer_Festival_REST {
         ]);
     }
 
-    private function is_rate_limited() {
-        $key = 'bftl_rl_' . md5($_SERVER['REMOTE_ADDR'] ?? '');
-        $count = get_transient($key);
-        if ($count === false) {
-            set_transient($key, 1, self::RATE_LIMIT_WINDOW);
-            return false;
-        }
-        if ($count >= self::RATE_LIMIT_MAX) {
-            return true;
-        }
-        set_transient($key, $count + 1, self::RATE_LIMIT_WINDOW);
-        return false;
-    }
-
     public function get_taps(WP_REST_Request $request) {
         $public = new Beer_Festival_Public();
         $data = $public->get_tap_list_data();
@@ -82,10 +66,6 @@ class Beer_Festival_REST {
     }
 
     public function assign_tap(WP_REST_Request $request) {
-        if ($this->is_rate_limited()) {
-            return new WP_Error('bftl_rate_limited', __('Too many requests, please try again in a few minutes.', 'beer-festival-tap'), ['status' => 429]);
-        }
-
         $settings = get_option('beer_festival_settings', []);
         $tap_count = isset($settings['tap_count']) ? intval($settings['tap_count']) : 16;
         $tap_id = intval($request->get_param('tap_id'));
