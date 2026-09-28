@@ -1,318 +1,603 @@
-@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap");
 
 :root {
     --bftl-mint: #5eead4;
     --bftl-warning: #d95252;
-    --bftl-card-dark: #17251f;
-    --bftl-card-light: #234a42;
-}
-
-.bftl-beer-single-body {
-    margin: 0;
-    min-height: 100%;
-    background: var(--bftl-card-dark);
-    font-family: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: #fff;
+    --bftl-ink: #22252d;
+    --bftl-line: #8e8c8c;
+    --bftl-muted: rgba(255, 255, 255, 0.5);
+    --bftl-hairline: rgba(255, 255, 255, 0.25);
+    --bftl-card-dark: #182722;
+    --bftl-card-light: #29655b;
+    --bftl-bg: radial-gradient(circle at 109% -8%, var(--bftl-card-light) 0%, var(--bftl-card-dark) 100%);
+    --bftl-app-w: 470px;
+    --bftl-gutter: 35px;
+    --bftl-btn-gutter: 25px;
 }
 
 *, *:before, *:after {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-.bftl-beer-single-page {
-    min-height: 100vh;
+html, body {
+    height: 100%;
+}
+html {
+    background-color: var(--bftl-card-dark);
+}
+
+.bftl-beer-single-body {
+    font-family: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #fff;
+    background-color: var(--bftl-card-dark);
+    background-image: var(--bftl-bg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    -webkit-font-smoothing: antialiased;
     display: flex;
-    align-items: flex-start;
     justify-content: center;
-    padding: 32px 16px;
+    min-height: 100vh;
+    min-height: 100dvh;
 }
 
-.bftl-beer-single-card {
+/* ---------- App shell ---------- */
+.bftl-beer-single-app {
+    position: relative;
     width: 100%;
-    max-width: 380px;
-    border-radius: 20px;
-    padding: 24px;
-    background: radial-gradient(120% 60% at 50% 0%, var(--bftl-card-light) 0%, var(--bftl-card-dark) 70%);
+    max-width: var(--bftl-app-w);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .bftl-beer-single-logo {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+    flex: 0 0 auto;
+    padding: clamp(20px, 4.5vh, 39px) 0 0 42px;
 }
-.bftl-beer-single-logo img {
-    height: 32px;
-    width: auto;
-}
-.bftl-beer-single-logo-text {
-    font-weight: 800;
-    font-size: 20px;
-    letter-spacing: 0.02em;
+.bftl-beer-single-logo svg {
+    display: block;
+    width: 190px;
+    height: 48.5px;
 }
 
+.bftl-beer-single-screen {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 var(--bftl-gutter);
+    padding-top: clamp(16px, 3.5vh, 45px);
+}
+
+.bftl-beer-single-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(24px, 4.5vh, 60px);
+    width: 100%;
+}
+
+/* ---------- Notice banner ---------- */
 .bftl-beer-single-banner {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
     gap: 10px;
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin-bottom: 20px;
+    align-self: stretch;
+    padding: 16px;
+    border-radius: 9px;
+    background: var(--bftl-warning);
+}
+.bftl-beer-single-banner svg {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
 }
 .bftl-beer-single-banner p {
-    margin: 0;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1.4;
-}
-.bftl-beer-single-banner.is-warning {
-    background: var(--bftl-warning);
+    flex: 1 1 auto;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.45;
     color: #fff;
 }
 .bftl-beer-single-banner.is-success {
     background: var(--bftl-mint);
-    color: #183a34;
+    color: var(--bftl-ink);
 }
-.bftl-beer-single-banner svg {
-    flex-shrink: 0;
-    margin-top: 1px;
-}
-
-.bftl-beer-single-eyebrow {
-    margin: 0 0 4px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
+.bftl-beer-single-banner.is-success p {
+    color: var(--bftl-ink);
 }
 
-.bftl-beer-single-title {
-    margin: 0 0 10px;
-    font-family: inherit;
-    font-size: 26px;
-    font-weight: 800;
-    line-height: 1.2;
-    color: #fff;
-}
-
-.bftl-beer-single-subline,
-.bftl-beer-single-stats {
-    margin: 0;
-    font-size: 13px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.6);
-}
-.bftl-beer-single-subline {
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-}
-.bftl-beer-single-stats {
-    margin-top: 10px;
-}
-.bftl-beer-single-dot {
-    margin: 0 6px;
-}
-
-.bftl-beer-single-taps {
-    margin-top: 24px;
+/* ---------- Beer info ---------- */
+.bftl-beer-single-info {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
+    width: 100%;
+    align-self: center;
 }
-
-.bftl-tap-block-label {
-    margin: 0 0 8px;
-    font-size: 13px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-/* Confirmed tap badge */
-.bftl-tap-confirmed {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    padding: 14px;
-    font-size: 18px;
-    font-weight: 800;
+.bftl-beer-single-eyebrow {
+    font-size: 16px;
+    font-weight: 500;
     text-transform: uppercase;
-    background-color: #fbb040;
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: var(--bftl-muted);
 }
-.bftl-tap-remove-btn {
-    width: 100%;
-    margin-top: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: transparent;
-    border: 1px solid var(--bftl-mint);
-    color: var(--bftl-mint);
-    border-radius: 999px;
-    padding: 12px;
+.bftl-beer-single-title {
     font-family: inherit;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.18;
+    color: #fff;
 }
-.bftl-tap-remove-btn:hover {
-    background: rgba(94, 234, 212, 0.1);
+.bftl-beer-single-subline,
+.bftl-beer-single-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--bftl-muted);
+}
+.bftl-beer-single-dot {
+    letter-spacing: -0.01em;
+}
+.bftl-beer-single-rule {
+    height: 1px;
+    border: 0;
+    background: var(--bftl-hairline);
 }
 
-/* Custom dropdown */
-.bftl-tap-dropdown {
+/* ---------- Tap field ---------- */
+.bftl-tap-field {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-self: stretch;
     position: relative;
-}
-.bftl-tap-dropdown-trigger {
     width: 100%;
+}
+.bftl-tap-field-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--bftl-muted);
+}
+
+.bftl-tap-select {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    min-height: 60px;
+    padding: 10px 24px;
+    border: 0;
+    border-radius: 12px;
     background: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 14px;
-    font-family: inherit;
-    font-size: 15px;
+    color: var(--bftl-ink);
+    font: inherit;
+    font-size: 18px;
     font-weight: 700;
-    color: #17251f;
-    cursor: pointer;
-}
-.bftl-tap-dropdown-trigger .bftl-tap-dropdown-label {
-    flex: 1;
     text-align: left;
-    color: #9a9a9a;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
-.bftl-tap-dropdown-trigger.has-value .bftl-tap-dropdown-label {
-    color: #17251f;
+.bftl-tap-select:focus-visible {
+    outline: 3px solid var(--bftl-mint);
+    outline-offset: 3px;
 }
-.bftl-tap-dropdown-chevron {
-    flex-shrink: 0;
-    transition: transform 0.15s ease;
+.bftl-tap-select-value {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    min-width: 0;
 }
-.bftl-tap-dropdown[data-open] .bftl-tap-dropdown-chevron {
+.bftl-tap-select-value > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.bftl-tap-select-chevron {
+    flex: 0 0 auto;
+    width: 17.2px;
+    height: 9.86px;
+    transition: transform 0.18s ease;
+}
+.bftl-tap-select[aria-expanded="true"] .bftl-tap-select-chevron {
     transform: rotate(180deg);
 }
-.bftl-tap-dropdown-dot {
-    width: 10px;
-    height: 10px;
+
+.bftl-tap-dot {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    flex-shrink: 0;
+    background-color: #fbb040;
+    box-shadow: 0 0 0 5px #fff;
     display: none;
 }
-.bftl-tap-dropdown-trigger.has-value .bftl-tap-dropdown-dot {
+.bftl-tap-select-value .bftl-tap-dot {
+    box-shadow: none;
+}
+.bftl-tap-select-value.has-value .bftl-tap-dot,
+.bftl-tap-option .bftl-tap-dot {
     display: block;
 }
 
-.bftl-tap-dropdown-list {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: calc(100% + 6px);
-    z-index: 20;
-    max-height: 260px;
-    overflow-y: auto;
-    margin: 0;
-    padding: 4px 0;
-    list-style: none;
-    background: var(--bftl-card-dark);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+/* ---------- Chosen tap badge (published state) ---------- */
+.bftl-tap-chosen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 9px;
+    background-color: #fbb040;
+    font-size: 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+    text-align: center;
 }
-.bftl-tap-dropdown-list[hidden] {
+
+/* ---------- Footer actions ---------- */
+.bftl-beer-single-actions {
+    flex: 0 0 auto;
+    padding: clamp(12px, 3vh, 24px) var(--bftl-btn-gutter) max(24px, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.bftl-btn-ghost {
+    padding: clamp(12px, 3vh, 24px) 12px;
+    border: 0;
+    border-radius: 50px;
+    background: none;
+    font: inherit;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--bftl-muted);
+    cursor: pointer;
+}
+.bftl-btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 16px 12px;
+    border: 1px solid var(--bftl-mint);
+    border-radius: 12px;
+    background: none;
+    font: inherit;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--bftl-mint);
+    cursor: pointer;
+    transition: opacity 0.18s ease, background-color 0.18s ease;
+}
+.bftl-btn-primary svg {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 auto;
+    stroke: var(--bftl-mint);
+}
+.bftl-btn-primary[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.bftl-btn-primary:not([disabled]):hover {
+    background: rgba(94, 234, 212, 0.08);
+}
+.bftl-btn-ghost:focus-visible,
+.bftl-btn-primary:focus-visible {
+    outline: 3px solid var(--bftl-mint);
+    outline-offset: 3px;
+}
+
+/* ---------- Tap picker sheet ---------- */
+.bftl-tap-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: none;
+    flex-direction: column;
+    background-color: var(--bftl-card-dark);
+    background-image: var(--bftl-bg);
+    background-repeat: no-repeat;
+    padding-top: env(safe-area-inset-top);
+}
+.bftl-tap-sheet.is-open {
+    display: flex;
+}
+.bftl-tap-backdrop {
     display: none;
 }
-.bftl-tap-dropdown-option {
+
+.bftl-tap-sheet-head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 12px 6px;
+}
+.bftl-tap-sheet-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--bftl-muted);
+}
+.bftl-tap-sheet-close {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+.bftl-tap-sheet-close:focus-visible {
+    outline: 3px solid var(--bftl-mint);
+    outline-offset: 2px;
+}
+
+.bftl-tap-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 0 12px 12px;
+}
+.bftl-tap-option {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 14px;
-    font-size: 14px;
+    width: 100%;
+    padding: 12px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--bftl-line);
+    background: none;
+    font: inherit;
+    font-size: 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #fff;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.bftl-tap-option .bftl-tap-dot {
+    box-shadow: none;
+}
+.bftl-tap-option:hover,
+.bftl-tap-option:focus-visible {
+    background: rgba(255, 255, 255, 0.06);
+    outline: none;
+}
+.bftl-tap-option[aria-selected="true"] {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.bftl-tap-sheet.is-anchored {
+    inset: auto;
+    padding-top: 0;
+    background-image: none;
+    background-color: #1d302a;
+    max-height: min(420px, 50dvh);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+.bftl-tap-sheet.is-anchored .bftl-tap-sheet-head {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .bftl-tap-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 40;
+    }
+    .bftl-tap-backdrop.is-open {
+        display: block;
+    }
+}
+
+/* ---------- Confirmation dialog ---------- */
+.bftl-confirm-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: none;
+    background: rgba(0, 0, 0, 0.55);
+}
+.bftl-confirm-scrim.is-open {
+    display: block;
+}
+
+.bftl-confirm-dialog {
+    position: fixed;
+    z-index: 61;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: var(--bftl-app-w);
+    margin: 0 auto;
+    display: none;
+    flex-direction: column;
+    padding: 32px 32px max(28px, env(safe-area-inset-bottom));
+    background-color: var(--bftl-card-dark);
+    background-image: var(--bftl-bg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
+}
+.bftl-confirm-dialog.is-open {
+    display: flex;
+}
+.bftl-confirm-title {
+    font-family: inherit;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.21;
+    color: #fff;
+}
+.bftl-confirm-body {
+    margin-top: 24px;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.21;
+    color: var(--bftl-muted);
+}
+.bftl-confirm-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 28px;
+}
+.bftl-confirm-btn {
+    padding: 16px 12px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font: inherit;
+    font-size: 18px;
     font-weight: 700;
     color: #fff;
     cursor: pointer;
-    text-transform: uppercase;
+    transition: filter 0.18s ease;
 }
-.bftl-tap-dropdown-option:hover,
-.bftl-tap-dropdown-option.is-active {
-    background: rgba(255, 255, 255, 0.08);
+.bftl-confirm-btn:hover {
+    filter: brightness(1.08);
 }
-.bftl-tap-dropdown-option .bftl-tap-dropdown-dot {
-    display: block;
-    background-color: #fbb040;
+.bftl-confirm-btn:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
 }
-
-.bftl-tap-cancel-link {
-    display: block;
-    text-align: center;
-    margin: 16px 0;
-    font-size: 13px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.6);
-    text-decoration: none;
+.bftl-confirm-btn--no {
+    background: #ff383c;
 }
-.bftl-tap-cancel-link:hover {
-    color: #fff;
+.bftl-confirm-btn--yes {
+    background: #34c759;
+    border-color: var(--bftl-mint);
 }
 
-.bftl-tap-publish-btn {
-    width: 100%;
-    display: inline-flex;
+@media (min-width: 768px) {
+    .bftl-confirm-dialog {
+        bottom: auto;
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 16px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    }
+}
+
+@media (max-width: 400px) {
+    .bftl-confirm-dialog {
+        padding: 24px 24px max(24px, env(safe-area-inset-bottom));
+    }
+    .bftl-confirm-title {
+        font-size: 28px;
+    }
+    .bftl-confirm-body {
+        font-size: 20px;
+        margin-top: 20px;
+    }
+}
+
+/* ---------- Loading overlay (shown while a publish/remove request is in flight) ---------- */
+.bftl-loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: none;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    background: transparent;
-    border: 1px solid var(--bftl-mint);
-    color: var(--bftl-mint);
-    border-radius: 999px;
-    padding: 12px;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
+    gap: 16px;
+    background: rgba(24, 39, 34, 0.85);
 }
-.bftl-tap-publish-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
+.bftl-loading-overlay.is-open {
+    display: flex;
 }
-.bftl-tap-publish-btn:not(:disabled):hover {
-    background: rgba(94, 234, 212, 0.1);
+.bftl-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.25);
+    border-top-color: var(--bftl-mint);
+    animation: bftl-spin 0.8s linear infinite;
 }
-
-/* Category colors -- shared palette with the tap list */
-.bftl-tap-confirmed[data-category="NEIPA/Hazy"],
-.bftl-tap-dropdown-dot[data-category="NEIPA/Hazy"],
-.bftl-tap-dropdown-option[data-category="NEIPA/Hazy"] .bftl-tap-dropdown-dot { background-color: #ff8c27; }
-.bftl-tap-confirmed[data-category="IPA"],
-.bftl-tap-dropdown-dot[data-category="IPA"],
-.bftl-tap-dropdown-option[data-category="IPA"] .bftl-tap-dropdown-dot { background-color: #c01717; }
-.bftl-tap-confirmed[data-category="Lager"],
-.bftl-tap-dropdown-dot[data-category="Lager"],
-.bftl-tap-dropdown-option[data-category="Lager"] .bftl-tap-dropdown-dot { background-color: #ffcc00; }
-.bftl-tap-confirmed[data-category="Pale Ale"],
-.bftl-tap-dropdown-dot[data-category="Pale Ale"],
-.bftl-tap-dropdown-option[data-category="Pale Ale"] .bftl-tap-dropdown-dot { background-color: #ae5100; }
-.bftl-tap-confirmed[data-category="Dark"],
-.bftl-tap-dropdown-dot[data-category="Dark"],
-.bftl-tap-dropdown-option[data-category="Dark"] .bftl-tap-dropdown-dot { background-color: #000; border: 1px solid rgba(255,255,255,0.4); }
-.bftl-tap-confirmed[data-category="Sour"],
-.bftl-tap-dropdown-dot[data-category="Sour"],
-.bftl-tap-dropdown-option[data-category="Sour"] .bftl-tap-dropdown-dot { background-color: #d400ff; }
-.bftl-tap-confirmed[data-category="Special"],
-.bftl-tap-dropdown-dot[data-category="Special"],
-.bftl-tap-dropdown-option[data-category="Special"] .bftl-tap-dropdown-dot { background-color: #07c9ff; }
-
-.bftl-tap-confirmed[data-category="Lager"],
-.bftl-tap-confirmed[data-category="Special"] {
-    color: #000;
+.bftl-loading-overlay p {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--bftl-muted);
 }
-
-@media (min-width: 601px) {
-    .bftl-beer-single-page {
-        align-items: center;
+@keyframes bftl-spin {
+    to {
+        transform: rotate(360deg);
     }
+}
+
+/* ---------- Scrollbars ---------- */
+.bftl-beer-single-screen,
+.bftl-tap-list {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+.bftl-beer-single-screen::-webkit-scrollbar,
+.bftl-tap-list::-webkit-scrollbar {
+    width: 6px;
+}
+.bftl-beer-single-screen::-webkit-scrollbar-track,
+.bftl-tap-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+.bftl-beer-single-screen::-webkit-scrollbar-thumb,
+.bftl-tap-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.22);
+    border-radius: 3px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* ---------- Category colors -- shared palette with the tap list ---------- */
+.bftl-tap-chosen[data-category="NEIPA/Hazy"],
+.bftl-tap-dot[data-category="NEIPA/Hazy"],
+.bftl-tap-option[data-category="NEIPA/Hazy"] .bftl-tap-dot { background-color: #ff8c27; }
+.bftl-tap-chosen[data-category="IPA"],
+.bftl-tap-dot[data-category="IPA"],
+.bftl-tap-option[data-category="IPA"] .bftl-tap-dot { background-color: #c01717; }
+.bftl-tap-chosen[data-category="Lager"],
+.bftl-tap-dot[data-category="Lager"],
+.bftl-tap-option[data-category="Lager"] .bftl-tap-dot { background-color: #ffcc00; }
+.bftl-tap-chosen[data-category="Pale Ale"],
+.bftl-tap-dot[data-category="Pale Ale"],
+.bftl-tap-option[data-category="Pale Ale"] .bftl-tap-dot { background-color: #ae5100; }
+.bftl-tap-chosen[data-category="Dark"],
+.bftl-tap-dot[data-category="Dark"],
+.bftl-tap-option[data-category="Dark"] .bftl-tap-dot { background-color: #000; border: 1px solid rgba(255,255,255,0.4); }
+.bftl-tap-chosen[data-category="Sour"],
+.bftl-tap-dot[data-category="Sour"],
+.bftl-tap-option[data-category="Sour"] .bftl-tap-dot { background-color: #d400ff; }
+.bftl-tap-chosen[data-category="Special"],
+.bftl-tap-dot[data-category="Special"],
+.bftl-tap-option[data-category="Special"] .bftl-tap-dot { background-color: #07c9ff; }
+
+.bftl-tap-chosen[data-category="Lager"],
+.bftl-tap-chosen[data-category="Special"] {
+    color: #000;
 }

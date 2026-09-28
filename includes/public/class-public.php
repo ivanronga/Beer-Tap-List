@@ -40,12 +40,24 @@ class Beer_Festival_Public {
             true
         );
 
+        $beer_id = get_queried_object_id();
+        $taps = Tap_Manager::get_all_taps();
+        $current_tap_ids = [];
+        if (!is_wp_error($taps)) {
+            foreach ($taps as $tap) {
+                if ($tap->active && intval($tap->beer_id) === $beer_id) {
+                    $current_tap_ids[] = intval($tap->tap_id);
+                }
+            }
+        }
+
         wp_localize_script(
             'bftl-beer-single',
             'BeerSingle',
             [
-                'beer_id'         => get_queried_object_id(),
-                'assign_rest_url' => rest_url('beer-festival-tap-list/v1/taps/assign'),
+                'beer_id'          => $beer_id,
+                'assign_rest_url'  => rest_url('beer-festival-tap-list/v1/taps/assign'),
+                'current_tap_ids'  => $current_tap_ids,
             ]
         );
     }
