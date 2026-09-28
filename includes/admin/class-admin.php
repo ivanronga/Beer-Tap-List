@@ -9,6 +9,9 @@ class Beer_Festival_Admin {
         add_action('admin_post_bftl_add_category', [$this, 'handle_add_category']);
         add_action('admin_post_bftl_rename_category', [$this, 'handle_rename_category']);
         add_action('admin_post_bftl_delete_category', [$this, 'handle_delete_category']);
+        add_action('admin_post_bftl_export_csv', [$this, 'handle_export_csv']);
+        add_action('admin_post_bftl_import_upload', [$this, 'handle_import_upload']);
+        add_action('admin_post_bftl_import_process', [$this, 'handle_import_process']);
     }
 
     public function register_admin_menu() {
@@ -54,6 +57,14 @@ class Beer_Festival_Admin {
         );
         add_submenu_page(
             'beer-festival-settings',
+            __('Import/Export', 'beer-festival-tap'),
+            __('Import/Export', 'beer-festival-tap'),
+            'manage_options',
+            'beer-festival-import-export',
+            [$this, 'render_import_export_page']
+        );
+        add_submenu_page(
+            'beer-festival-settings',
             __('All Beers', 'beer-festival-tap'),
             __('All Beers', 'beer-festival-tap'),
             'manage_options',
@@ -75,6 +86,10 @@ class Beer_Festival_Admin {
             wp_enqueue_style('bftl-admin', plugins_url('../admin/css/admin-styles.css', __FILE__), [], BEER_FESTIVAL_VERSION);
             wp_enqueue_script('bftl-qrcode', plugins_url('../public/js/qrcode.min.js', __FILE__), [], '1.4.4', true);
             wp_enqueue_script('bftl-qr-codes', plugins_url('../admin/js/qr-codes.js', __FILE__), ['bftl-qrcode'], BEER_FESTIVAL_VERSION, true);
+            return;
+        }
+        if ($hook === 'beer-festival_page_beer-festival-import-export') {
+            wp_enqueue_style('bftl-admin', plugins_url('../admin/css/admin-styles.css', __FILE__), [], BEER_FESTIVAL_VERSION);
             return;
         }
         if ($hook === 'beer-festival_page_beer-festival-tap-zones') {
@@ -229,7 +244,7 @@ class Beer_Festival_Admin {
      * redirects it to the current pretty URL (or serves it directly if
      * pretty permalinks are ever turned off), unlike a slug-based link.
      */
-    private function get_stable_beer_url($beer_id) {
+    public static function get_stable_beer_url($beer_id) {
         return home_url('/?post_type=beer&p=' . intval($beer_id));
     }
 
@@ -258,6 +273,21 @@ class Beer_Festival_Admin {
                 <?php foreach ($beers as $beer):
                     $brewer = get_post_meta($beer->ID, '_beer_brewer', true);
                     $category = get_post_meta($beer->ID, '_beer_category', true);
+                    $style = get_post_meta($beer->ID, '_beer_stil', true);
+                    $location = get_post_meta($beer->ID, '_beer_location', true);
+                    $ibu = get_post_meta($beer->ID, '_beer_ibu', true);
+                    $abv = get_post_meta($beer->ID, '_beer_abv', true);
+
+                    $brewer_line = $brewer;
+                    if ($location) {
+                        $brewer_line = $brewer ? ($brewer . ' • ' . $location) : $location;
+                    }
+
+                    $stats_parts = [];
+                    if ($style) $stats_parts[] = $style;
+                    if ($ibu !== '') $stats_parts[] = 'IBU: ' . $ibu;
+                    if ($abv !== '') $stats_parts[] = 'ABV: ' . $abv . '%';
+                    $stats_line = implode(' • ', $stats_parts);
                 ?>
                 <div class="bftl-qr-item" data-permalink="<?php echo esc_attr($this->get_stable_beer_url($beer->ID)); ?>" data-brewer="<?php echo esc_attr($brewer); ?>" data-category="<?php echo esc_attr($category); ?>">
                     <?php if ($category): ?>
@@ -265,8 +295,11 @@ class Beer_Festival_Admin {
                     <?php endif; ?>
                     <div class="bftl-qr-item-code bftl-qr-item-code-clickable" role="button" tabindex="0" aria-label="<?php esc_attr_e('Preview QR code', 'beer-festival-tap'); ?>"></div>
                     <p class="bftl-qr-item-name"><?php echo esc_html($beer->post_title); ?></p>
-                    <?php if ($brewer): ?>
-                    <p class="bftl-qr-item-brewer"><?php echo esc_html($brewer); ?></p>
+                    <?php if ($brewer_line): ?>
+                    <p class="bftl-qr-item-brewer"><?php echo esc_html($brewer_line); ?></p>
+                    <?php endif; ?>
+                    <?php if ($stats_line): ?>
+                    <p class="bftl-qr-item-stats"><?php echo esc_html($stats_line); ?></p>
                     <?php endif; ?>
                     <div class="bftl-qr-item-actions">
                         <button type="button" class="button bftl-qr-download"><?php _e('Download', 'beer-festival-tap'); ?></button>
@@ -395,6 +428,279 @@ class Beer_Festival_Admin {
             $this->redirect_to_categories('', $result->get_error_message());
         }
         $this->redirect_to_categories(__('Category deleted.', 'beer-festival-tap'));
+    }
+
+    public function render_import_export_page() {
+        $step = isset($_GET['step']) ? sanitize_key($_GET['step']) : '';
+        $notice = isset($_GET['bftl_notice']) ? sanitize_text_field($_GET['bftl_notice']) : '';
+        $error = isset($_GET['bftl_error']) ? sanitize_text_field($_GET['bftl_error']) : '';
+        ?>
+        <div class="wrap">
+            <h1><?php _e('Import / Export Beers', 'beer-festival-tap'); ?></h1>
+
+            <?php if ($notice): ?>
+                <div class="notice notice-success"><p><?php echo esc_html($notice); ?></p></div>
+            <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="notice notice-error"><p><?php echo esc_html($error); ?></p></div>
+            <?php endif; ?>
+
+            <?php
+            if ($step === 'map') {
+                $this->render_import_mapping_step();
+            } elseif ($step === 'results') {
+                $this->render_import_results_step();
+            } else {
+                $this->render_import_export_initial_step();
+            }
+            ?>
+        </div>
+        <?php
+    }
+
+    private function render_import_export_initial_step() {
+        $export_url = wp_nonce_url(admin_url('admin-post.php?action=bftl_export_csv'), 'bftl_export_csv');
+        ?>
+        <h2><?php _e('Export', 'beer-festival-tap'); ?></h2>
+        <p><?php _e('Download all published beers as a spreadsheet: Beer Name, Style, Category, Brewer, Location, ABV, IBU, and a QR reference link.', 'beer-festival-tap'); ?></p>
+        <p>
+            <a href="<?php echo esc_url($export_url); ?>" class="button button-primary"><?php _e('Export Beers', 'beer-festival-tap'); ?></a>
+        </p>
+        <p class="description"><?php _e('The file downloads with an .xls extension for convenience, but its content is plain CSV — Excel may show a one-time "format doesn\'t match extension" warning on open; choosing "Yes" opens it correctly.', 'beer-festival-tap'); ?></p>
+
+        <hr>
+
+        <h2><?php _e('Import', 'beer-festival-tap'); ?></h2>
+        <p><?php _e('Upload a spreadsheet to bulk-create or update beers. You\'ll map its columns to the right fields before anything is imported.', 'beer-festival-tap'); ?></p>
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" enctype="multipart/form-data">
+            <?php wp_nonce_field('bftl_import_upload'); ?>
+            <input type="hidden" name="action" value="bftl_import_upload">
+            <p><input type="file" name="import_file" accept=".csv,.xls,.xlsx" required></p>
+            <p><button type="submit" class="button button-primary"><?php _e('Upload &amp; Continue', 'beer-festival-tap'); ?></button></p>
+        </form>
+        <?php
+    }
+
+    private function render_import_mapping_step() {
+        $import_id = isset($_GET['import_id']) ? sanitize_key($_GET['import_id']) : '';
+        $data = $import_id ? get_transient('bftl_import_data_' . $import_id) : false;
+
+        if (!$data) {
+            echo '<div class="notice notice-error"><p>' . esc_html__('This upload has expired. Please upload the file again.', 'beer-festival-tap') . '</p></div>';
+            echo '<p><a href="' . esc_url(admin_url('admin.php?page=beer-festival-import-export')) . '" class="button">' . esc_html__('Back', 'beer-festival-tap') . '</a></p>';
+            return;
+        }
+
+        $headers = $data['headers'];
+        $mapping = Beer_Festival_Import_Export::guess_column_mapping($headers);
+        $row_count = count($data['rows']);
+
+        $fields = [
+            'beer_name' => __('Beer Name', 'beer-festival-tap'),
+            'stil'      => __('Style', 'beer-festival-tap'),
+            'category'  => __('Category', 'beer-festival-tap'),
+            'brewer'    => __('Brewer', 'beer-festival-tap'),
+            'location'  => __('Location', 'beer-festival-tap'),
+            'abv'       => __('ABV', 'beer-festival-tap'),
+            'ibu'       => __('IBU', 'beer-festival-tap'),
+        ];
+        ?>
+        <h2><?php _e('Map columns', 'beer-festival-tap'); ?></h2>
+        <p><?php printf(esc_html__('Found %d data row(s) in the uploaded file. Choose which uploaded column maps to each field below.', 'beer-festival-tap'), $row_count); ?></p>
+
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+            <?php wp_nonce_field('bftl_import_process'); ?>
+            <input type="hidden" name="action" value="bftl_import_process">
+            <input type="hidden" name="import_id" value="<?php echo esc_attr($import_id); ?>">
+
+            <table class="widefat" style="max-width: 600px;">
+                <thead>
+                    <tr>
+                        <th><?php _e('Field', 'beer-festival-tap'); ?></th>
+                        <th><?php _e('Uploaded column', 'beer-festival-tap'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($fields as $field_key => $field_label):
+                        $required = $field_key === 'beer_name';
+                        $selected_index = $mapping[$field_key];
+                    ?>
+                    <tr>
+                        <td><?php echo esc_html($field_label); ?><?php echo $required ? ' <span style="color:#c00;">*</span>' : ''; ?></td>
+                        <td>
+                            <select name="mapping[<?php echo esc_attr($field_key); ?>]" <?php echo $required ? 'required' : ''; ?>>
+                                <?php if ($required && $selected_index === ''): ?>
+                                <option value="" disabled selected><?php _e('-- Select --', 'beer-festival-tap'); ?></option>
+                                <?php elseif (!$required): ?>
+                                <option value="" <?php selected($selected_index, ''); ?>><?php _e('-- Do not import --', 'beer-festival-tap'); ?></option>
+                                <?php endif; ?>
+                                <?php foreach ($headers as $index => $header): ?>
+                                <option value="<?php echo esc_attr($index); ?>" <?php selected($selected_index, $index); ?>><?php echo esc_html($header); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <p class="description"><?php _e('A Category value that doesn\'t already exist will be created automatically. Existing beers are matched by exact Beer Name (case-insensitive) — a new name creates a new beer.', 'beer-festival-tap'); ?></p>
+
+            <p>
+                <button type="submit" class="button button-primary"><?php _e('Import', 'beer-festival-tap'); ?></button>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=beer-festival-import-export')); ?>" class="button"><?php _e('Cancel', 'beer-festival-tap'); ?></a>
+            </p>
+        </form>
+        <?php
+    }
+
+    private function render_import_results_step() {
+        $import_id = isset($_GET['import_id']) ? sanitize_key($_GET['import_id']) : '';
+        $results = $import_id ? get_transient('bftl_import_results_' . $import_id) : false;
+
+        if (!$results) {
+            echo '<div class="notice notice-warning"><p>' . esc_html__('Import results are no longer available (they expire after an hour), but the import itself already ran.', 'beer-festival-tap') . '</p></div>';
+            echo '<p><a href="' . esc_url(admin_url('admin.php?page=beer-festival-import-export')) . '" class="button">' . esc_html__('Back', 'beer-festival-tap') . '</a></p>';
+            return;
+        }
+
+        $counts = ['created' => 0, 'updated' => 0, 'error' => 0];
+        foreach ($results as $result) {
+            if (isset($counts[$result['action']])) {
+                $counts[$result['action']]++;
+            }
+        }
+        ?>
+        <h2><?php _e('Import results', 'beer-festival-tap'); ?></h2>
+        <p>
+            <?php printf(
+                esc_html__('%1$d created, %2$d updated, %3$d error(s).', 'beer-festival-tap'),
+                $counts['created'], $counts['updated'], $counts['error']
+            ); ?>
+        </p>
+        <table class="widefat" style="max-width: 800px;">
+            <thead>
+                <tr>
+                    <th><?php _e('Row', 'beer-festival-tap'); ?></th>
+                    <th><?php _e('Beer', 'beer-festival-tap'); ?></th>
+                    <th><?php _e('Result', 'beer-festival-tap'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($results as $result):
+                    $feedback_class = $result['action'] === 'error' ? 'bftl-feedback-error' : 'bftl-feedback-success';
+                ?>
+                <tr>
+                    <td><?php echo esc_html($result['row']); ?></td>
+                    <td><?php echo esc_html($result['beer_name'] !== '' ? $result['beer_name'] : '—'); ?></td>
+                    <td><span class="bftl-row-feedback <?php echo esc_attr($feedback_class); ?>"><?php echo esc_html($result['message']); ?></span></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <p style="margin-top: 16px;">
+            <a href="<?php echo esc_url(admin_url('admin.php?page=beer-festival-import-export')); ?>" class="button"><?php _e('Import another file', 'beer-festival-tap'); ?></a>
+            <a href="<?php echo esc_url(admin_url('edit.php?post_type=beer')); ?>" class="button button-primary"><?php _e('View All Beers', 'beer-festival-tap'); ?></a>
+        </p>
+        <?php
+    }
+
+    private function redirect_to_import_export($notice = '', $error = '') {
+        $args = ['page' => 'beer-festival-import-export'];
+        if ($notice) $args['bftl_notice'] = $notice;
+        if ($error) $args['bftl_error'] = $error;
+        wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));
+        exit;
+    }
+
+    public function handle_export_csv() {
+        check_admin_referer('bftl_export_csv');
+        if (!current_user_can('manage_options')) {
+            wp_die(__('Unauthorized', 'beer-festival-tap'));
+        }
+        Beer_Festival_Import_Export::stream_csv_export();
+    }
+
+    public function handle_import_upload() {
+        check_admin_referer('bftl_import_upload');
+        if (!current_user_can('manage_options')) {
+            wp_die(__('Unauthorized', 'beer-festival-tap'));
+        }
+
+        if (empty($_FILES['import_file']) || !is_uploaded_file($_FILES['import_file']['tmp_name'] ?? '')) {
+            $this->redirect_to_import_export('', __('Please choose a file to upload.', 'beer-festival-tap'));
+        }
+
+        $file = $_FILES['import_file'];
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $this->redirect_to_import_export('', __('Upload failed, please try again.', 'beer-festival-tap'));
+        }
+        if ($file['size'] > 5 * 1024 * 1024) {
+            $this->redirect_to_import_export('', __('File is too large (max 5MB).', 'beer-festival-tap'));
+        }
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, ['csv', 'xls', 'xlsx'], true)) {
+            $this->redirect_to_import_export('', __('Please upload a .csv or .xls file.', 'beer-festival-tap'));
+        }
+
+        $parsed = Beer_Festival_Import_Export::parse_csv_file($file['tmp_name']);
+        if (is_wp_error($parsed)) {
+            $this->redirect_to_import_export('', $parsed->get_error_message());
+        }
+        if (empty($parsed['rows'])) {
+            $this->redirect_to_import_export('', __('No data rows found in that file.', 'beer-festival-tap'));
+        }
+
+        $import_id = bin2hex(random_bytes(8));
+        set_transient('bftl_import_data_' . $import_id, $parsed, 15 * MINUTE_IN_SECONDS);
+
+        wp_safe_redirect(add_query_arg([
+            'page'      => 'beer-festival-import-export',
+            'step'      => 'map',
+            'import_id' => $import_id,
+        ], admin_url('admin.php')));
+        exit;
+    }
+
+    public function handle_import_process() {
+        check_admin_referer('bftl_import_process');
+        if (!current_user_can('manage_options')) {
+            wp_die(__('Unauthorized', 'beer-festival-tap'));
+        }
+
+        $import_id = isset($_POST['import_id']) ? sanitize_key($_POST['import_id']) : '';
+        $data = $import_id ? get_transient('bftl_import_data_' . $import_id) : false;
+        if (!$data) {
+            wp_safe_redirect(add_query_arg([
+                'page'       => 'beer-festival-import-export',
+                'bftl_error' => __('This upload expired, please try again.', 'beer-festival-tap'),
+            ], admin_url('admin.php')));
+            exit;
+        }
+
+        $mapping = isset($_POST['mapping']) && is_array($_POST['mapping']) ? wp_unslash($_POST['mapping']) : [];
+        $mapping = array_map(function ($value) {
+            return $value === '' ? '' : intval($value);
+        }, $mapping);
+
+        $title_map = Beer_Festival_Import_Export::build_title_map();
+        $results = [];
+        $row_number = 1; // header row is 1
+        foreach ($data['rows'] as $row) {
+            $row_number++;
+            $results[] = Beer_Festival_Import_Export::import_row($mapping, $row, $title_map, $row_number);
+        }
+
+        delete_transient('bftl_import_data_' . $import_id);
+        set_transient('bftl_import_results_' . $import_id, $results, HOUR_IN_SECONDS);
+
+        wp_safe_redirect(add_query_arg([
+            'page'      => 'beer-festival-import-export',
+            'step'      => 'results',
+            'import_id' => $import_id,
+        ], admin_url('admin.php')));
+        exit;
     }
 
     public function render_main_page() {

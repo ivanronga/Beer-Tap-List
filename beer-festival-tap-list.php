@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Beer Festival Tap List
  * Description: Real-time tap list management for beer festivals
- * Version: 2.7.1
+ * Version: 2.8.0
  * Author: Beer Festival Tap List Contributors
  * Requires at least: 6.0
  * Requires PHP: 7.4
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('BEER_FESTIVAL_VERSION', '2.7.1');
+define('BEER_FESTIVAL_VERSION', '2.8.0');
 define('BEER_FESTIVAL_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BEER_FESTIVAL_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -46,6 +46,7 @@ function beer_festival_init_plugin() {
     // Load required classes
     $core_files = [
         'includes/class-categories.php',  // Beer/tap categories
+        'includes/class-beer-import-export.php', // CSV export/import for beers
         'includes/class-beer-cpt.php',    // Beer custom post type
         'includes/class-tap-manager.php', // Tap management
         'includes/class-settings.php',    // Plugin settings

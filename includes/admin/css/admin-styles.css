@@ -73,6 +73,12 @@
     margin: 2px 0 0;
     word-break: break-word;
 }
+.bftl-qr-item-stats {
+    color: #888;
+    font-size: 11px;
+    margin: 2px 0 0;
+    word-break: break-word;
+}
 .bftl-qr-item-actions {
     display: flex;
     justify-content: center;

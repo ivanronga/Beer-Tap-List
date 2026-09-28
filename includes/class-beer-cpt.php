@@ -203,13 +203,36 @@ class Beer_CPT {
         if ('beer' !== get_post_type($post_id)) {
             return;
         }
-        update_post_meta($post_id, '_beer_stil', sanitize_text_field($_POST['beer_stil'] ?? ''));
-        update_post_meta($post_id, '_beer_brewer', sanitize_text_field($_POST['beer_brewer'] ?? ''));
-        update_post_meta($post_id, '_beer_location', sanitize_text_field($_POST['beer_location'] ?? ''));
-        update_post_meta($post_id, '_beer_ibu', intval($_POST['beer_ibu'] ?? 0));
-        update_post_meta($post_id, '_beer_abv', floatval($_POST['beer_abv'] ?? 0));
 
-        $category = sanitize_text_field($_POST['beer_category'] ?? '');
+        self::sanitize_and_save_beer_meta($post_id, [
+            'stil'     => $_POST['beer_stil'] ?? '',
+            'brewer'   => $_POST['beer_brewer'] ?? '',
+            'location' => $_POST['beer_location'] ?? '',
+            'ibu'      => $_POST['beer_ibu'] ?? 0,
+            'abv'      => $_POST['beer_abv'] ?? 0,
+            'category' => $_POST['beer_category'] ?? '',
+        ]);
+    }
+
+    /**
+     * Sanitizes and saves the six beer meta fields from a plain data array.
+     * Shared by the meta-box save above and the bulk CSV importer, so both
+     * paths apply identical validation (including the category whitelist
+     * check, which silently blanks an unrecognized category rather than
+     * rejecting the whole save).
+     */
+    public static function sanitize_and_save_beer_meta($post_id, array $data) {
+        if ('beer' !== get_post_type($post_id)) {
+            return;
+        }
+
+        update_post_meta($post_id, '_beer_stil', sanitize_text_field($data['stil'] ?? ''));
+        update_post_meta($post_id, '_beer_brewer', sanitize_text_field($data['brewer'] ?? ''));
+        update_post_meta($post_id, '_beer_location', sanitize_text_field($data['location'] ?? ''));
+        update_post_meta($post_id, '_beer_ibu', intval($data['ibu'] ?? 0));
+        update_post_meta($post_id, '_beer_abv', floatval($data['abv'] ?? 0));
+
+        $category = sanitize_text_field($data['category'] ?? '');
         if (!in_array($category, Beer_Festival_Categories::get_selectable(false), true)) {
             $category = '';
         }
