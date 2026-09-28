@@ -149,9 +149,13 @@ class Beer_Festival_Admin {
                 <tbody>
                     <?php for ($i = 1; $i <= $tap_count; $i++):
                         $current = isset($tap_map[$i]) ? $tap_map[$i] : null;
+                        $current_category = $current && $current->category ? $current->category : Beer_Festival_Categories::DEFAULT_CATEGORY;
                     ?>
                     <tr data-tap="<?php echo $i; ?>">
-                        <td><?php echo esc_html($i); ?></td>
+                        <td>
+                            <?php echo esc_html($i); ?>
+                            <span class="bftl-tap-zone"><?php echo esc_html($current_category); ?></span>
+                        </td>
                         <td>
                             <select class="bftl-select2 bftl-tap-beer" data-tap="<?php echo $i; ?>" style="width: 300px;">
                                 <option value=""><?php _e('-- Empty --', 'beer-festival-tap'); ?></option>
