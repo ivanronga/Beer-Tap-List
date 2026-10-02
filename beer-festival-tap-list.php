@@ -62,14 +62,16 @@ function beer_festival_init_plugin() {
         require_once BEER_FESTIVAL_PLUGIN_DIR . $file;
     }
 
+    // Tap changes arrive through the REST API (QR flow, Tap Management Save),
+    // which is not is_admin(), so the activity log listener must always be on.
+    require_once BEER_FESTIVAL_PLUGIN_DIR . 'includes/class-concurrent-edit.php';
+    new Beer_Festival_Concurrent_Edit();
+
     // Initialize admin and public components
     if (is_admin()) {
         global $beer_festival_settings;
         $beer_festival_settings = new Beer_Festival_Settings();
         new Beer_Festival_Admin();
-
-        require_once BEER_FESTIVAL_PLUGIN_DIR . 'includes/class-concurrent-edit.php';
-        new Beer_Festival_Concurrent_Edit();
     }
     new Beer_Festival_Public();
     new Beer_Festival_REST();
