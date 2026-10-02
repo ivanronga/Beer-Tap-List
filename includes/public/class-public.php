@@ -66,6 +66,32 @@ class Beer_Festival_Public {
         return plugins_url('includes/public/' . $relative_path, BEER_FESTIVAL_PLUGIN_DIR . 'beer-festival-tap-list.php');
     }
 
+    /**
+     * Enabled marketing popup ads, mapped to the plain-array shape the
+     * front-end scheduler needs. Shared by the normal enqueue path and the
+     * iframe wrapper's doc.write() sequence so both stay in sync.
+     */
+    private function get_ads_payload() {
+        $ads = Beer_Festival_Marketing_Popups::get_enabled_ordered();
+        $payload = [];
+        if (is_wp_error($ads)) {
+            return $payload;
+        }
+        foreach ($ads as $ad) {
+            $image_url = wp_get_attachment_image_url($ad->image_id, 'large');
+            if (!$image_url) {
+                continue; // attachment was deleted -- skip rather than show a broken image
+            }
+            $payload[] = [
+                'id'               => intval($ad->id),
+                'image_url'        => $image_url,
+                'interval_minutes' => intval($ad->interval_minutes),
+                'duration_seconds' => intval($ad->duration_seconds),
+            ];
+        }
+        return $payload;
+    }
+
     public function enqueue_public_assets() {
         $settings = get_option('beer_festival_settings', []);
         $refresh_interval = isset($settings['refresh_interval']) ? intval($settings['refresh_interval']) : 30;
@@ -95,6 +121,27 @@ class Beer_Festival_Public {
                 'new_duration' => $new_duration,
                 'css_url' => $this->get_asset_url('css/tap-list-styles.css')
             )
+        );
+
+        wp_enqueue_style(
+            'bftl-tap-list-ads',
+            $this->get_asset_url('css/tap-list-ads.css'),
+            [],
+            BEER_FESTIVAL_VERSION
+        );
+
+        wp_enqueue_script(
+            'bftl-tap-list-ads',
+            $this->get_asset_url('js/tap-list-ads.js'),
+            array('jquery'),
+            BEER_FESTIVAL_VERSION,
+            true
+        );
+
+        wp_localize_script(
+            'bftl-tap-list-ads',
+            'BFTLAds',
+            array('ads' => $this->get_ads_payload())
         );
     }
 
@@ -211,6 +258,7 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
                 doc.open();
                 doc.write(' . json_encode($tap_list_html) . ');
                 doc.write(\'<link rel="stylesheet" href="' . esc_url($this->get_asset_url('css/tap-list-styles.css')) . '">\');
+                doc.write(\'<link rel="stylesheet" href="' . esc_url($this->get_asset_url('css/tap-list-ads.css')) . '">\');
                 doc.write(\'<script type="text/javascript" src="' . esc_url(includes_url('js/jquery/jquery.min.js')) . '"><\/script>\');
                 doc.write(\'<script type="text/javascript" src="' . esc_url($this->get_asset_url('js/tap-list-display.js')) . '"><\/script>\');
                 doc.write(\'<script type="text/javascript">var BFTLFront = ' . json_encode([
@@ -219,6 +267,8 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
                     'new_duration' => isset($settings['new_beer_duration']) ? intval($settings['new_beer_duration']) : 60,
                     'css_url' => $this->get_asset_url('css/tap-list-styles.css')
                 ]) . ';<\/script>\');
+                doc.write(\'<script type="text/javascript" src="' . esc_url($this->get_asset_url('js/tap-list-ads.js')) . '"><\/script>\');
+                doc.write(\'<script type="text/javascript">var BFTLAds = ' . json_encode(['ads' => $this->get_ads_payload()]) . ';<\/script>\');
                 doc.close();
             })();
             </script>';

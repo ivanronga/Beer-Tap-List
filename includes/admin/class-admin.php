@@ -13,6 +13,10 @@ class Beer_Festival_Admin {
         add_action('admin_post_bftl_import_upload', [$this, 'handle_import_upload']);
         add_action('admin_post_bftl_import_process', [$this, 'handle_import_process']);
         add_action('admin_post_bftl_delete_all_beers', [$this, 'handle_delete_all_beers']);
+        add_action('admin_post_bftl_add_popup', [$this, 'handle_add_popup']);
+        add_action('admin_post_bftl_update_popup', [$this, 'handle_update_popup']);
+        add_action('admin_post_bftl_delete_popup', [$this, 'handle_delete_popup']);
+        add_action('admin_post_bftl_toggle_popup', [$this, 'handle_toggle_popup']);
     }
 
     public function register_admin_menu() {
@@ -66,6 +70,14 @@ class Beer_Festival_Admin {
         );
         add_submenu_page(
             'beer-festival-settings',
+            __('Marketing Popups', 'beer-festival-tap'),
+            __('Marketing Popups', 'beer-festival-tap'),
+            'manage_options',
+            'beer-festival-marketing-popups',
+            [$this, 'render_marketing_popups_page']
+        );
+        add_submenu_page(
+            'beer-festival-settings',
             __('All Beers', 'beer-festival-tap'),
             __('All Beers', 'beer-festival-tap'),
             'manage_options',
@@ -91,6 +103,12 @@ class Beer_Festival_Admin {
         }
         if ($hook === 'beer-festival_page_beer-festival-import-export') {
             wp_enqueue_style('bftl-admin', plugins_url('../admin/css/admin-styles.css', __FILE__), [], BEER_FESTIVAL_VERSION);
+            return;
+        }
+        if ($hook === 'beer-festival_page_beer-festival-marketing-popups') {
+            wp_enqueue_media();
+            wp_enqueue_style('bftl-admin', plugins_url('../admin/css/admin-styles.css', __FILE__), [], BEER_FESTIVAL_VERSION);
+            wp_enqueue_script('bftl-marketing-popups', plugins_url('../admin/js/marketing-popups.js', __FILE__), [], BEER_FESTIVAL_VERSION, true);
             return;
         }
         if ($hook === 'beer-festival_page_beer-festival-tap-zones') {
@@ -765,6 +783,180 @@ class Beer_Festival_Admin {
             __('%d beer(s) moved to Trash. All taps were cleared.', 'beer-festival-tap'),
             $deleted
         ));
+    }
+
+    public function render_marketing_popups_page() {
+        $edit_id = isset($_GET['edit']) ? intval($_GET['edit']) : 0;
+        $editing = $edit_id ? Beer_Festival_Marketing_Popups::get($edit_id) : null;
+        $ads = Beer_Festival_Marketing_Popups::get_all();
+        $notice = isset($_GET['bftl_notice']) ? sanitize_text_field($_GET['bftl_notice']) : '';
+        $error = isset($_GET['bftl_error']) ? sanitize_text_field($_GET['bftl_error']) : '';
+        ?>
+        <div class="wrap">
+            <h1><?php _e('Marketing Popups', 'beer-festival-tap'); ?></h1>
+            <p><?php _e('Static-image ads shown over the public tap list board, cycling one at a time on their own interval/duration.', 'beer-festival-tap'); ?></p>
+
+            <?php if ($notice): ?>
+                <div class="notice notice-success"><p><?php echo esc_html($notice); ?></p></div>
+            <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="notice notice-error"><p><?php echo esc_html($error); ?></p></div>
+            <?php endif; ?>
+
+            <table class="widefat" style="max-width: 800px;">
+                <thead>
+                    <tr>
+                        <th><?php _e('Image', 'beer-festival-tap'); ?></th>
+                        <th><?php _e('Interval (min)', 'beer-festival-tap'); ?></th>
+                        <th><?php _e('Duration (sec)', 'beer-festival-tap'); ?></th>
+                        <th><?php _e('Status', 'beer-festival-tap'); ?></th>
+                        <th><?php _e('Actions', 'beer-festival-tap'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (is_wp_error($ads)): ?>
+                    <tr><td colspan="5"><?php echo esc_html($ads->get_error_message()); ?></td></tr>
+                    <?php elseif (empty($ads)): ?>
+                    <tr><td colspan="5"><?php _e('No ads yet.', 'beer-festival-tap'); ?></td></tr>
+                    <?php else: foreach ($ads as $ad): ?>
+                    <tr>
+                        <td><?php echo wp_get_attachment_image($ad->image_id, [60, 60], true, ['class' => 'bftl-popup-thumb']); ?></td>
+                        <td><?php echo esc_html($ad->interval_minutes); ?></td>
+                        <td><?php echo esc_html($ad->duration_seconds); ?></td>
+                        <td>
+                            <?php if ($ad->enabled): ?>
+                                <span class="bftl-status-enabled"><?php _e('Enabled', 'beer-festival-tap'); ?></span>
+                            <?php else: ?>
+                                <span class="bftl-status-disabled"><?php _e('Disabled', 'beer-festival-tap'); ?></span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: nowrap;">
+                                <a class="button" href="<?php echo esc_url(add_query_arg(['page' => 'beer-festival-marketing-popups', 'edit' => $ad->id], admin_url('admin.php'))); ?>"><?php _e('Edit', 'beer-festival-tap'); ?></a>
+                                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                                    <?php wp_nonce_field('bftl_toggle_popup'); ?>
+                                    <input type="hidden" name="action" value="bftl_toggle_popup">
+                                    <input type="hidden" name="id" value="<?php echo esc_attr($ad->id); ?>">
+                                    <button type="submit" class="button"><?php echo $ad->enabled ? esc_html__('Disable', 'beer-festival-tap') : esc_html__('Enable', 'beer-festival-tap'); ?></button>
+                                </form>
+                                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" onsubmit="return confirm('<?php echo esc_js(__('Delete this ad?', 'beer-festival-tap')); ?>');">
+                                    <?php wp_nonce_field('bftl_delete_popup'); ?>
+                                    <input type="hidden" name="action" value="bftl_delete_popup">
+                                    <input type="hidden" name="id" value="<?php echo esc_attr($ad->id); ?>">
+                                    <button type="submit" class="button button-link-delete"><?php _e('Delete', 'beer-festival-tap'); ?></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; endif; ?>
+                </tbody>
+            </table>
+
+            <h2><?php echo $editing ? esc_html__('Edit Ad', 'beer-festival-tap') : esc_html__('Add New Ad', 'beer-festival-tap'); ?></h2>
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="max-width: 400px;">
+                <?php wp_nonce_field($editing ? 'bftl_update_popup' : 'bftl_add_popup'); ?>
+                <input type="hidden" name="action" value="<?php echo $editing ? 'bftl_update_popup' : 'bftl_add_popup'; ?>">
+                <?php if ($editing): ?>
+                <input type="hidden" name="id" value="<?php echo esc_attr($editing->id); ?>">
+                <?php endif; ?>
+
+                <p>
+                    <label><?php _e('Image:', 'beer-festival-tap'); ?></label><br>
+                    <input type="hidden" id="bftl-popup-image-id" name="image_id" value="<?php echo esc_attr($editing ? $editing->image_id : ''); ?>">
+                    <img id="bftl-popup-image-preview" src="<?php echo $editing ? esc_url(wp_get_attachment_image_url($editing->image_id, 'medium')) : ''; ?>" style="display:<?php echo $editing ? 'block' : 'none'; ?>; max-width:200px; max-height:200px; margin-bottom:8px;">
+                    <br>
+                    <button type="button" id="bftl-popup-select-image" class="button"><?php _e('Select Image', 'beer-festival-tap'); ?></button>
+                </p>
+
+                <p>
+                    <label><?php _e('Interval (minutes):', 'beer-festival-tap'); ?></label><br>
+                    <input type="number" name="interval_minutes" min="1" step="1" required value="<?php echo esc_attr($editing ? $editing->interval_minutes : 15); ?>" style="width:100%;">
+                </p>
+                <p>
+                    <label><?php _e('Duration (seconds):', 'beer-festival-tap'); ?></label><br>
+                    <input type="number" name="duration_seconds" min="1" step="1" required value="<?php echo esc_attr($editing ? $editing->duration_seconds : 10); ?>" style="width:100%;">
+                </p>
+                <p>
+                    <label>
+                        <input type="checkbox" name="enabled" value="1" <?php checked($editing ? $editing->enabled : 1); ?>>
+                        <?php _e('Enabled', 'beer-festival-tap'); ?>
+                    </label>
+                </p>
+
+                <button type="submit" class="button button-primary"><?php echo $editing ? esc_html__('Save Changes', 'beer-festival-tap') : esc_html__('Add Ad', 'beer-festival-tap'); ?></button>
+                <?php if ($editing): ?>
+                <a class="button" href="<?php echo esc_url(admin_url('admin.php?page=beer-festival-marketing-popups')); ?>"><?php _e('Cancel', 'beer-festival-tap'); ?></a>
+                <?php endif; ?>
+            </form>
+        </div>
+        <?php
+    }
+
+    private function redirect_to_popups($notice = '', $error = '') {
+        $args = ['page' => 'beer-festival-marketing-popups'];
+        if ($notice) $args['bftl_notice'] = $notice;
+        if ($error) $args['bftl_error'] = $error;
+        wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));
+        exit;
+    }
+
+    public function handle_add_popup() {
+        check_admin_referer('bftl_add_popup');
+        if (!current_user_can('manage_options')) {
+            wp_die(__('Unauthorized', 'beer-festival-tap'));
+        }
+        $result = Beer_Festival_Marketing_Popups::create([
+            'image_id'         => intval($_POST['image_id'] ?? 0),
+            'interval_minutes' => intval($_POST['interval_minutes'] ?? 0),
+            'duration_seconds' => intval($_POST['duration_seconds'] ?? 0),
+            'enabled'          => isset($_POST['enabled']) ? 1 : 0,
+        ]);
+        if (is_wp_error($result)) {
+            $this->redirect_to_popups('', $result->get_error_message());
+        }
+        $this->redirect_to_popups(__('Ad added.', 'beer-festival-tap'));
+    }
+
+    public function handle_update_popup() {
+        check_admin_referer('bftl_update_popup');
+        if (!current_user_can('manage_options')) {
+            wp_die(__('Unauthorized', 'beer-festival-tap'));
+        }
+        $id = intval($_POST['id'] ?? 0);
+        $result = Beer_Festival_Marketing_Popups::update($id, [
+            'image_id'         => intval($_POST['image_id'] ?? 0),
+            'interval_minutes' => intval($_POST['interval_minutes'] ?? 0),
+            'duration_seconds' => intval($_POST['duration_seconds'] ?? 0),
+            'enabled'          => isset($_POST['enabled']) ? 1 : 0,
+        ]);
+        if (is_wp_error($result)) {
+            $this->redirect_to_popups('', $result->get_error_message());
+        }
+        $this->redirect_to_popups(__('Ad updated.', 'beer-festival-tap'));
+    }
+
+    public function handle_delete_popup() {
+        check_admin_referer('bftl_delete_popup');
+        if (!current_user_can('manage_options')) {
+            wp_die(__('Unauthorized', 'beer-festival-tap'));
+        }
+        $result = Beer_Festival_Marketing_Popups::delete(intval($_POST['id'] ?? 0));
+        if (is_wp_error($result)) {
+            $this->redirect_to_popups('', $result->get_error_message());
+        }
+        $this->redirect_to_popups(__('Ad deleted.', 'beer-festival-tap'));
+    }
+
+    public function handle_toggle_popup() {
+        check_admin_referer('bftl_toggle_popup');
+        if (!current_user_can('manage_options')) {
+            wp_die(__('Unauthorized', 'beer-festival-tap'));
+        }
+        $result = Beer_Festival_Marketing_Popups::toggle_enabled(intval($_POST['id'] ?? 0));
+        if (is_wp_error($result)) {
+            $this->redirect_to_popups('', $result->get_error_message());
+        }
+        $this->redirect_to_popups(__('Ad status updated.', 'beer-festival-tap'));
     }
 
     public function render_main_page() {

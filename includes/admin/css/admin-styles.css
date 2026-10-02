@@ -182,6 +182,22 @@
     }
 }
 
+.bftl-popup-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+}
+.bftl-status-enabled {
+    color: #1a7a1a;
+    font-weight: 600;
+}
+.bftl-status-disabled {
+    color: #a00;
+    font-weight: 600;
+}
+
 .bftl-row-feedback {
     margin-left: 8px;
     font-weight: 600;
