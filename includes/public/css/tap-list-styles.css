@@ -180,7 +180,16 @@
   .tap-item{
     border-bottom:3px solid #919296;
     grid-template-areas:"is-tap-number beer-name      beer-name        ibu  abv" "is-tap-number is-beer-style  is-beer-style    ibu  abv" "is-tap-number brewer-name    brewer-location  ibu  abv";
-    grid-template-columns:43px 162px 1fr 51px 51px;
+    grid-template-columns:43px minmax(48px,auto) minmax(48px,auto) 51px 51px;
+  }
+  /* Brewer and location size to their content (each row is its own grid, so a
+     short brewer hands its spare width to a long location, and vice versa).
+     The beer name and style span both columns; zero intrinsic width keeps their
+     length from driving the column sizes. */
+  .tap-item--inner.beer-name,
+  .tap-item--inner.is-beer-style{
+    min-width:100%;
+    width:0;
   }
 
   .tap-item--inner{
@@ -420,7 +429,7 @@
   padding:var(--unit) calc(var(--unit)*3) 0 calc(var(--unit)*3);
 }.empty-tap--inner{
   align-items:center;
-  color:red;
+  color:#ffcc00;
   display:flex;
   font-size:24px;
   font-weight:var(--type-weight-bold);
