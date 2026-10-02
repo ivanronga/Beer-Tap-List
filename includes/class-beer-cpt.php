@@ -179,14 +179,18 @@ class Beer_CPT {
         if ('beer' !== get_post_type($post_id)) {
             return;
         }
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
 
+        $input = wp_unslash($_POST);
         self::sanitize_and_save_beer_meta($post_id, [
-            'stil'     => $_POST['beer_stil'] ?? '',
-            'brewer'   => $_POST['beer_brewer'] ?? '',
-            'location' => $_POST['beer_location'] ?? '',
-            'ibu'      => $_POST['beer_ibu'] ?? 0,
-            'abv'      => $_POST['beer_abv'] ?? 0,
-            'category' => $_POST['beer_category'] ?? '',
+            'stil'     => $input['beer_stil'] ?? '',
+            'brewer'   => $input['beer_brewer'] ?? '',
+            'location' => $input['beer_location'] ?? '',
+            'ibu'      => $input['beer_ibu'] ?? 0,
+            'abv'      => $input['beer_abv'] ?? 0,
+            'category' => $input['beer_category'] ?? '',
         ]);
     }
 
