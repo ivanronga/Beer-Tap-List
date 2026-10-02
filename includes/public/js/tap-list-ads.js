@@ -16,7 +16,7 @@ jQuery(document).ready(function ($) {
     // absolute timestamp in localStorage lets the wait correctly span any
     // number of page reloads in between.
     var STORAGE_KEY = 'bftl_ads_schedule';
-    var adsFingerprint = ads.map(function (a) { return a.id + ':' + a.interval_minutes; }).join(',');
+    var adsFingerprint = ads.map(function (a) { return a.id + ':' + a.interval_seconds; }).join(',');
 
     function readState() {
         try {
@@ -52,8 +52,8 @@ jQuery(document).ready(function ($) {
         '<div class="bftl-ad-popup" id="bftl-ad-popup">' +
         '  <div class="bftl-ad-popup-image-wrap">' +
         '    <img class="bftl-ad-popup-image" id="bftl-ad-popup-image" alt="">' +
+        '    <button type="button" class="bftl-ad-popup-close" id="bftl-ad-popup-close" aria-label="Close">&times;</button>' +
         '  </div>' +
-        '  <button type="button" class="bftl-ad-popup-close" id="bftl-ad-popup-close" aria-label="Close">&times;</button>' +
         '</div>'
     );
     $('body').append($popup);
@@ -83,9 +83,9 @@ jQuery(document).ready(function ($) {
         $popup.removeClass('is-open');
         visibleIndex = null;
 
-        // Cooldown before the next ad uses that ad's own interval_minutes.
+        // Cooldown before the next ad uses that ad's own interval_seconds.
         var nextIndex = (index + 1) % ads.length;
-        var nextDueAt = Date.now() + ads[nextIndex].interval_minutes * 60000;
+        var nextDueAt = Date.now() + ads[nextIndex].interval_seconds * 1000;
         scheduleNext(nextIndex, nextDueAt);
     }
 
@@ -100,7 +100,7 @@ jQuery(document).ready(function ($) {
     if (initial) {
         scheduleNext(initial.index, initial.dueAt);
     } else {
-        scheduleNext(0, Date.now() + ads[0].interval_minutes * 60000);
+        scheduleNext(0, Date.now() + ads[0].interval_seconds * 1000);
     }
 
     $(window).on('beforeunload', function () {

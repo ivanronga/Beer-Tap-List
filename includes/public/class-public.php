@@ -85,7 +85,7 @@ class Beer_Festival_Public {
             $payload[] = [
                 'id'               => intval($ad->id),
                 'image_url'        => $image_url,
-                'interval_minutes' => intval($ad->interval_minutes),
+                'interval_seconds' => intval($ad->interval_seconds),
                 'duration_seconds' => intval($ad->duration_seconds),
             ];
         }

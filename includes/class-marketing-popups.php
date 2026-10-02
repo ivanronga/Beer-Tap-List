@@ -12,10 +12,18 @@ class Beer_Festival_Marketing_Popups {
 
         $charset_collate = $wpdb->get_charset_collate();
 
+        // v2.10.0-2.10.4 stored the interval in minutes. dbDelta can't rename a
+        // column, so convert it in place (and rescale existing rows) first.
+        $has_old_column = $wpdb->get_var("SHOW COLUMNS FROM $table_name LIKE 'interval_minutes'");
+        if ($has_old_column) {
+            $wpdb->query("ALTER TABLE $table_name CHANGE interval_minutes interval_seconds INT UNSIGNED NOT NULL DEFAULT 900");
+            $wpdb->query("UPDATE $table_name SET interval_seconds = interval_seconds * 60");
+        }
+
         $sql = "CREATE TABLE $table_name (
             id INT UNSIGNED NOT NULL AUTO_INCREMENT,
             image_id BIGINT UNSIGNED NOT NULL,
-            interval_minutes INT UNSIGNED NOT NULL DEFAULT 15,
+            interval_seconds INT UNSIGNED NOT NULL DEFAULT 900,
             duration_seconds INT UNSIGNED NOT NULL DEFAULT 10,
             enabled TINYINT(1) NOT NULL DEFAULT 1,
             display_order INT UNSIGNED NOT NULL DEFAULT 0,
@@ -78,7 +86,7 @@ class Beer_Festival_Marketing_Popups {
             $table_name,
             [
                 'image_id'         => $validated['image_id'],
-                'interval_minutes' => $validated['interval_minutes'],
+                'interval_seconds' => $validated['interval_seconds'],
                 'duration_seconds' => $validated['duration_seconds'],
                 'enabled'          => $validated['enabled'],
                 'display_order'    => $next_order,
@@ -106,7 +114,7 @@ class Beer_Festival_Marketing_Popups {
             $table_name,
             [
                 'image_id'         => $validated['image_id'],
-                'interval_minutes' => $validated['interval_minutes'],
+                'interval_seconds' => $validated['interval_seconds'],
                 'duration_seconds' => $validated['duration_seconds'],
                 'enabled'          => $validated['enabled'],
             ],
@@ -156,9 +164,9 @@ class Beer_Festival_Marketing_Popups {
             return new WP_Error('bftl_popup_invalid_image', __('Please select an image for this ad.', 'beer-festival-tap'));
         }
 
-        $interval_minutes = intval($data['interval_minutes'] ?? 0);
-        if ($interval_minutes < 1) {
-            return new WP_Error('bftl_popup_invalid_interval', __('Interval must be at least 1 minute.', 'beer-festival-tap'));
+        $interval_seconds = intval($data['interval_seconds'] ?? 0);
+        if ($interval_seconds < 1) {
+            return new WP_Error('bftl_popup_invalid_interval', __('Interval must be at least 1 second.', 'beer-festival-tap'));
         }
 
         $duration_seconds = intval($data['duration_seconds'] ?? 0);
@@ -168,7 +176,7 @@ class Beer_Festival_Marketing_Popups {
 
         return [
             'image_id'         => $image_id,
-            'interval_minutes' => $interval_minutes,
+            'interval_seconds' => $interval_seconds,
             'duration_seconds' => $duration_seconds,
             'enabled'          => !empty($data['enabled']) ? 1 : 0,
         ];

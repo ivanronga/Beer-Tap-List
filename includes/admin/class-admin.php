@@ -807,7 +807,7 @@ class Beer_Festival_Admin {
                 <thead>
                     <tr>
                         <th><?php _e('Image', 'beer-festival-tap'); ?></th>
-                        <th><?php _e('Interval (min)', 'beer-festival-tap'); ?></th>
+                        <th><?php _e('Interval (sec)', 'beer-festival-tap'); ?></th>
                         <th><?php _e('Duration (sec)', 'beer-festival-tap'); ?></th>
                         <th><?php _e('Status', 'beer-festival-tap'); ?></th>
                         <th><?php _e('Actions', 'beer-festival-tap'); ?></th>
@@ -821,7 +821,7 @@ class Beer_Festival_Admin {
                     <?php else: foreach ($ads as $ad): ?>
                     <tr>
                         <td><?php echo wp_get_attachment_image($ad->image_id, [60, 60], true, ['class' => 'bftl-popup-thumb']); ?></td>
-                        <td><?php echo esc_html($ad->interval_minutes); ?></td>
+                        <td><?php echo esc_html($ad->interval_seconds); ?></td>
                         <td><?php echo esc_html($ad->duration_seconds); ?></td>
                         <td>
                             <?php if ($ad->enabled): ?>
@@ -869,8 +869,8 @@ class Beer_Festival_Admin {
                 </p>
 
                 <p>
-                    <label><?php _e('Interval (minutes):', 'beer-festival-tap'); ?></label><br>
-                    <input type="number" name="interval_minutes" min="1" step="1" required value="<?php echo esc_attr($editing ? $editing->interval_minutes : 15); ?>" style="width:100%;">
+                    <label><?php _e('Interval (seconds):', 'beer-festival-tap'); ?></label><br>
+                    <input type="number" name="interval_seconds" min="1" step="1" required value="<?php echo esc_attr($editing ? $editing->interval_seconds : 900); ?>" style="width:100%;">
                 </p>
                 <p>
                     <label><?php _e('Duration (seconds):', 'beer-festival-tap'); ?></label><br>
@@ -907,7 +907,7 @@ class Beer_Festival_Admin {
         }
         $result = Beer_Festival_Marketing_Popups::create([
             'image_id'         => intval($_POST['image_id'] ?? 0),
-            'interval_minutes' => intval($_POST['interval_minutes'] ?? 0),
+            'interval_seconds' => intval($_POST['interval_seconds'] ?? 0),
             'duration_seconds' => intval($_POST['duration_seconds'] ?? 0),
             'enabled'          => isset($_POST['enabled']) ? 1 : 0,
         ]);
@@ -925,7 +925,7 @@ class Beer_Festival_Admin {
         $id = intval($_POST['id'] ?? 0);
         $result = Beer_Festival_Marketing_Popups::update($id, [
             'image_id'         => intval($_POST['image_id'] ?? 0),
-            'interval_minutes' => intval($_POST['interval_minutes'] ?? 0),
+            'interval_seconds' => intval($_POST['interval_seconds'] ?? 0),
             'duration_seconds' => intval($_POST['duration_seconds'] ?? 0),
             'enabled'          => isset($_POST['enabled']) ? 1 : 0,
         ]);
