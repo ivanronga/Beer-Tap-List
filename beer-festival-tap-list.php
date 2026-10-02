@@ -2,11 +2,13 @@
 /**
  * Plugin Name: Beer Festival Tap List
  * Description: Real-time tap list management for beer festivals
- * Version: 2.11.3
+ * Version: 2.12.0
  * Author: Beer Festival Tap List Contributors
  * Requires at least: 6.0
  * Requires PHP: 7.4
- * Tested up to: 6.6
+ * Tested up to: 7.1
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: beer-festival-tap
  * Domain Path: /languages
  */
@@ -17,7 +19,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('BEER_FESTIVAL_VERSION', '2.11.3');
+define('BEER_FESTIVAL_VERSION', '2.12.0');
 define('BEER_FESTIVAL_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BEER_FESTIVAL_PLUGIN_URL', plugin_dir_url(__FILE__));
 
