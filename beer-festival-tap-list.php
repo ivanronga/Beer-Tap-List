@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Beer Festival Tap List
  * Description: Real-time tap list management for beer festivals
- * Version: 2.9.5
+ * Version: 2.10.3
  * Author: Beer Festival Tap List Contributors
  * Requires at least: 6.0
  * Requires PHP: 7.4
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('BEER_FESTIVAL_VERSION', '2.9.5');
+define('BEER_FESTIVAL_VERSION', '2.10.3');
 define('BEER_FESTIVAL_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BEER_FESTIVAL_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -27,8 +27,10 @@ register_deactivation_hook(__FILE__, 'beer_festival_deactivate');
 function beer_festival_activate() {
     require_once BEER_FESTIVAL_PLUGIN_DIR . 'includes/class-tap-manager.php';
     require_once BEER_FESTIVAL_PLUGIN_DIR . 'includes/class-beer-cpt.php';
-    
+    require_once BEER_FESTIVAL_PLUGIN_DIR . 'includes/class-marketing-popups.php';
+
     Tap_Manager::create_tap_status_table();
+    Beer_Festival_Marketing_Popups::create_table();
 
     // Register the beer CPT and flush rewrite rules
     $beer_cpt = new Beer_CPT();
@@ -46,6 +48,7 @@ function beer_festival_init_plugin() {
     // Load required classes
     $core_files = [
         'includes/class-categories.php',  // Beer/tap categories
+        'includes/class-marketing-popups.php', // Marketing popup ads
         'includes/class-beer-import-export.php', // CSV export/import for beers
         'includes/class-beer-cpt.php',    // Beer custom post type
         'includes/class-tap-manager.php', // Tap management
@@ -85,6 +88,7 @@ function beer_festival_maybe_upgrade() {
     }
 
     Tap_Manager::create_tap_status_table();
+    Beer_Festival_Marketing_Popups::create_table();
     flush_rewrite_rules();
 
     // Backfill any taps with no zone to the protected "Default" category.
