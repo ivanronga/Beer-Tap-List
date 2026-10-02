@@ -8,6 +8,20 @@ class Beer_Festival_Public {
         add_action('wp_enqueue_scripts', [$this, 'enqueue_public_assets']);
         add_filter('single_template', [$this, 'load_single_beer_template']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_single_beer_assets']);
+        add_filter('wp_robots', [$this, 'noindex_beer_pages']);
+    }
+
+    /**
+     * Beer pages are staff controls reached from a QR code; keep them out of
+     * search results.
+     */
+    public function noindex_beer_pages($robots) {
+        if (is_singular('beer')) {
+            $robots['noindex'] = true;
+            $robots['nofollow'] = true;
+            unset($robots['max-image-preview']);
+        }
+        return $robots;
     }
 
     public function load_single_beer_template($template) {
