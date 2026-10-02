@@ -1,12 +1,21 @@
 .bftl-ad-popup {
     position: fixed;
     z-index: 100001;
-    display: none;
     font-family: var(--ff-sans, sans-serif);
     box-sizing: border-box;
+
+    /* Fade in/out. visibility (not display) keeps the transition running and
+       takes the popup out of hit-testing once it has finished fading out. */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.5s ease, visibility 0s linear 0.5s;
 }
 .bftl-ad-popup.is-open {
-    display: block;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.5s ease, visibility 0s;
 }
 
 /* ---------- Desktop: right-half panel, full height ---------- */
@@ -17,11 +26,6 @@
     width: 50%;
     background: var(--row-bg, #22252d);
     box-shadow: -8px 0 24px rgba(0, 0, 0, 0.4);
-    transform: translateX(100%);
-    transition: transform 0.35s ease;
-}
-.bftl-ad-popup.is-open {
-    transform: translateX(0);
 }
 .bftl-ad-popup-image-wrap {
     position: relative;
@@ -61,16 +65,11 @@
         right: 0;
         bottom: 0;
         width: 100%;
-        display: none;
+        display: flex;
         align-items: center;
         justify-content: center;
         background: rgba(0, 0, 0, 0.7);
         box-shadow: none;
-        transform: none;
-        transition: none;
-    }
-    .bftl-ad-popup.is-open {
-        display: flex;
     }
     .bftl-ad-popup-image-wrap {
         width: 90vw;
