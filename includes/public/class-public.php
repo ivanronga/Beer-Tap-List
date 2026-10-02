@@ -168,11 +168,6 @@ class Beer_Festival_Public {
         );
     }
 
-    private function get_refresh_interval() {
-        $settings = get_option('beer_festival_settings', []);
-$new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_beer_duration']) : 5; // Default: 5 seconds
-    }
-
     public function render_tap_list($atts) {
         $settings = get_option('beer_festival_settings', []);
         $num_taps = isset($settings['tap_count']) ? intval($settings['tap_count']) : 16;

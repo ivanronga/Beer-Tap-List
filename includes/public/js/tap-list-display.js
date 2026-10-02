@@ -4,17 +4,13 @@ jQuery(document).ready(function($) {
     let badgeTimeouts = {};
 
     function refreshTapList() {
-        console.log('Refreshing tap list...', BFTLFront);
-
         fetch(BFTLFront.rest_url)
             .then(response => response.json())
             .then(data => {
-                console.log('Tap list refresh response:', data);
                 data.forEach(tap => {
                         const tapId = tap.tap_id;
                         const $tap = $(`#tap-${tapId}`);
-                        console.log(`Updating tap ${tapId}:`, $tap.length ? 'found' : 'not found');
-                        
+
                         if ($tap.length) {
                             if (tap.is_empty) {
                                 // Clear all content except tap number
@@ -95,7 +91,6 @@ jQuery(document).ready(function($) {
 
     // Initial setup
     if (container.length) {
-        console.log('Initializing tap list with settings:', BFTLFront);
         refreshTapList(); // Initial call
         autoRefresh = setInterval(refreshTapList, BFTLFront.refresh_interval * 1000);
     } else {

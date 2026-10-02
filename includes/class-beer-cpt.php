@@ -23,7 +23,6 @@ class Beer_CPT {
 
     public function __construct() {
         add_action('init', [$this, 'register_beer_cpt']);
-        // add_action('init', [$this, 'register_beer_style_taxonomy']);
         add_action('add_meta_boxes', [$this, 'add_beer_meta_boxes']);
         add_action('save_post', [$this, 'save_beer_meta_fields']);
         add_filter('parent_file', [$this, 'set_admin_menu_parent']);
@@ -106,29 +105,6 @@ class Beer_CPT {
         ];
         register_post_type('beer', $args);
     }
-
-    // Register the 'beer_style' taxonomy
-    // public function register_beer_style_taxonomy() {
-    //     $labels = [
-    //         'name'              => __('Beer Styles', 'beer-festival-tap'),
-    //         'singular_name'     => __('Beer Style', 'beer-festival-tap'),
-    //         'search_items'      => __('Search Beer Styles', 'beer-festival-tap'),
-    //         'all_items'         => __('All Beer Styles', 'beer-festival-tap'),
-    //         'edit_item'         => __('Edit Beer Style', 'beer-festival-tap'),
-    //         'update_item'       => __('Update Beer Style', 'beer-festival-tap'),
-    //         'add_new_item'      => __('Add New Beer Style', 'beer-festival-tap'),
-    //         'new_item_name'     => __('New Beer Style Name', 'beer-festival-tap'),
-    //         'menu_name'         => __('Beer Styles', 'beer-festival-tap'),
-    //     ];
-    //     $args = [
-    //         'hierarchical'      => true,
-    //         'labels'            => $labels,
-    //         'show_ui'           => true,
-    //         'show_admin_column' => true,
-    //         'rewrite'           => false,
-    //     ];
-    //     register_taxonomy('beer_style', ['beer'], $args);
-    // }
 
     // Add meta boxes for custom fields
     public function add_beer_meta_boxes() {
