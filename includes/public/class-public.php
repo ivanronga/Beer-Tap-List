@@ -115,7 +115,22 @@ class Beer_Festival_Public {
         return $payload;
     }
 
+    /**
+     * The tap list and popup assets are only needed on a page that shows the
+     * [beer_tap_list] shortcode. Themes that print the board by calling
+     * do_shortcode() themselves can opt in with the filter.
+     */
+    private function should_enqueue_public_assets() {
+        $post = is_singular() ? get_post() : null;
+        $needed = $post && has_shortcode($post->post_content, 'beer_tap_list');
+        return (bool) apply_filters('bftl_should_enqueue_public_assets', $needed);
+    }
+
     public function enqueue_public_assets() {
+        if (!$this->should_enqueue_public_assets()) {
+            return;
+        }
+
         $settings = get_option('beer_festival_settings', []);
         $refresh_interval = isset($settings['refresh_interval']) ? intval($settings['refresh_interval']) : 30;
         $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_beer_duration']) : 60;
