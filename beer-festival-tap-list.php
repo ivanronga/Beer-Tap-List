@@ -8,6 +8,7 @@
  * Requires PHP: 7.4
  * Tested up to: 6.6
  * Text Domain: beer-festival-tap
+ * Domain Path: /languages
  */
 
 // Security check
@@ -19,6 +20,11 @@ if (!defined('ABSPATH')) {
 define('BEER_FESTIVAL_VERSION', '2.11.3');
 define('BEER_FESTIVAL_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BEER_FESTIVAL_PLUGIN_URL', plugin_dir_url(__FILE__));
+
+add_action('init', 'beer_festival_load_textdomain');
+function beer_festival_load_textdomain() {
+    load_plugin_textdomain('beer-festival-tap', false, dirname(plugin_basename(__FILE__)) . '/languages');
+}
 
 // Activation/Deactivation hooks
 register_activation_hook(__FILE__, 'beer_festival_activate');
