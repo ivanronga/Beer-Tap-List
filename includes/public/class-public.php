@@ -307,14 +307,14 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
     
     
 
-    private function is_new_beer($tapped_time, $settings) {
+    private static function is_new_beer($tapped_time, $settings) {
         if (!$tapped_time) return false;
         $duration = isset($settings['new_beer_duration']) ? intval($settings['new_beer_duration']) : 60;
         $tapped_timestamp = strtotime($tapped_time);
         return (time() - $tapped_timestamp) < $duration;
     }
 
-    public function get_tap_list_data() {
+    public static function get_tap_list_data() {
         $taps = Tap_Manager::get_all_taps();
         if (is_wp_error($taps)) {
             error_log('Tap List Error: ' . $taps->get_error_message());
@@ -358,7 +358,7 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
                     'brewer_location' => get_post_meta($beer->ID, '_beer_location', true),
                     'ibu' => get_post_meta($beer->ID, '_beer_ibu', true),
                     'abv' => get_post_meta($beer->ID, '_beer_abv', true),
-                    'is_new' => $this->is_new_beer($tap->tapped_time, $settings),
+                    'is_new' => self::is_new_beer($tap->tapped_time, $settings),
                     'is_empty' => false
                 ];
             } else {
@@ -374,5 +374,3 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
         return $data;
     }
 }
-
-new Beer_Festival_Public();
