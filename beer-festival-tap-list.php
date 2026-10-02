@@ -99,14 +99,4 @@ function beer_festival_maybe_upgrade() {
     update_option('beer_festival_db_version', BEER_FESTIVAL_VERSION);
 }
 
-// Handle uninstallation
-register_uninstall_hook(__FILE__, 'beer_festival_uninstall');
-
-function beer_festival_uninstall() {
-    if (!defined('BEER_FESTIVAL_PLUGIN_DIR')) {
-        return;
-    }
-    
-    // Custom uninstall logic from your requirements
-    require_once BEER_FESTIVAL_PLUGIN_DIR . 'uninstall.php';
-}
+// Uninstall cleanup lives in uninstall.php, which WordPress runs on its own.
