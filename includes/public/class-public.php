@@ -9,6 +9,37 @@ class Beer_Festival_Public {
         add_filter('single_template', [$this, 'load_single_beer_template']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_single_beer_assets']);
         add_filter('wp_robots', [$this, 'noindex_beer_pages']);
+        add_action('wp_enqueue_scripts', [$this, 'isolate_beer_page_assets'], 9999);
+    }
+
+    /**
+     * The staff beer page is a self-contained document with its own design, so
+     * no theme or block-editor stylesheet/script should leak into it. Keep only
+     * this plugin's assets and the admin bar (jQuery and the admin bar's other
+     * dependencies are pulled in automatically as dependencies).
+     */
+    public function isolate_beer_page_assets() {
+        if (!is_singular('beer')) {
+            return;
+        }
+
+        global $wp_styles, $wp_scripts;
+        $keep_styles  = ['bftl-beer-single-styles', 'admin-bar'];
+        $keep_scripts = ['bftl-beer-single', 'admin-bar'];
+
+        foreach ((array) $wp_styles->queue as $handle) {
+            if (!in_array($handle, $keep_styles, true)) {
+                wp_dequeue_style($handle);
+            }
+        }
+        foreach ((array) $wp_scripts->queue as $handle) {
+            if (!in_array($handle, $keep_scripts, true)) {
+                wp_dequeue_script($handle);
+            }
+        }
+        remove_action('wp_head', 'wp_print_auto_sizes_contain_css_fix', 1);
+        remove_action('wp_head', 'print_emoji_detection_script', 7);
+        remove_action('wp_print_styles', 'print_emoji_styles');
     }
 
     /**
@@ -226,7 +257,7 @@ class Beer_Festival_Public {
         }
     
         ob_start();
-        $tap_list_html = '<div class="bftl-tap-list" style="--tap-rows: ' . intval($num_taps) . ';">';
+        $tap_list_html = '<div class="bftl-tap-list" style="--bftl-tap-rows: ' . intval($num_taps) . ';">';
 
         // Row banding follows zone-category groups (all taps in the same zone share
         // a band), not individual rows -- flips only when the zone category changes.
@@ -289,7 +320,8 @@ class Beer_Festival_Public {
                 var iframe = document.getElementById("' . esc_js($iframe_id) . '");
                 var doc = iframe.contentWindow.document;
                 doc.open();
-                doc.write(' . json_encode($tap_list_html) . ');
+                doc.write(\'<style>html,body{margin:0;padding:0;background:#22252d}</style>\');
+                doc.write(' . json_encode('<div class="bftl-board">' . $tap_list_html . '</div>') . ');
                 doc.write(\'<link rel="stylesheet" href="' . esc_url($this->get_asset_url('css/tap-list-styles.css')) . '">\');
                 doc.write(\'<link rel="stylesheet" href="' . esc_url($this->get_asset_url('css/tap-list-ads.css')) . '">\');
                 doc.write(\'<script type="text/javascript" src="' . esc_url(includes_url('js/jquery/jquery.min.js')) . '"><\/script>\');
@@ -308,7 +340,8 @@ class Beer_Festival_Public {
             
             $output .= $init_script;
         } else {
-            $output = '<div class="bftl-tap-list-wrapper">' . $tap_list_html . '</div>';
+            // alignfull lets block themes break the board out of their content column.
+            $output = '<div class="bftl-tap-list-wrapper bftl-board alignfull">' . $tap_list_html . '</div>';
         }
         
         return $output;

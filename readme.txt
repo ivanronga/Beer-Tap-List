@@ -4,7 +4,7 @@ Tags: beer, festival, tap list, events
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.12.0
+Stable tag: 2.13.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,12 @@ your own protection if that is not acceptable.
 Its tables, options and temporary data are removed. Your Beer posts are kept.
 
 == Changelog ==
+
+= 2.13.0 =
+* Theme-agnostic frontend: the board, staff beer page and popups look the same in any theme (verified in Hombre and Twenty Twenty-Four).
+* Board styles are scoped under a single root element and no longer leak into, or inherit from, the active theme.
+* The staff beer page loads only the plugin's own assets.
+* Popups are self-contained and no longer depend on theme styles.
 
 = 2.12.0 =
 * Self-hosted the Figtree font; the plugin no longer requests anything from Google.
