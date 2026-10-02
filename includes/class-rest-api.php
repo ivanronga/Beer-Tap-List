@@ -57,8 +57,7 @@ class Beer_Festival_REST {
     }
 
     public function get_taps(WP_REST_Request $request) {
-        $public = new Beer_Festival_Public();
-        $data = $public->get_tap_list_data();
+        $data = Beer_Festival_Public::get_tap_list_data();
         if (is_wp_error($data)) {
             return $data;
         }

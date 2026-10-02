@@ -8,6 +8,20 @@ class Beer_Festival_Public {
         add_action('wp_enqueue_scripts', [$this, 'enqueue_public_assets']);
         add_filter('single_template', [$this, 'load_single_beer_template']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_single_beer_assets']);
+        add_filter('wp_robots', [$this, 'noindex_beer_pages']);
+    }
+
+    /**
+     * Beer pages are staff controls reached from a QR code; keep them out of
+     * search results.
+     */
+    public function noindex_beer_pages($robots) {
+        if (is_singular('beer')) {
+            $robots['noindex'] = true;
+            $robots['nofollow'] = true;
+            unset($robots['max-image-preview']);
+        }
+        return $robots;
     }
 
     public function load_single_beer_template($template) {
@@ -101,7 +115,22 @@ class Beer_Festival_Public {
         return $payload;
     }
 
+    /**
+     * The tap list and popup assets are only needed on a page that shows the
+     * [beer_tap_list] shortcode. Themes that print the board by calling
+     * do_shortcode() themselves can opt in with the filter.
+     */
+    private function should_enqueue_public_assets() {
+        $post = is_singular() ? get_post() : null;
+        $needed = $post && has_shortcode($post->post_content, 'beer_tap_list');
+        return (bool) apply_filters('bftl_should_enqueue_public_assets', $needed);
+    }
+
     public function enqueue_public_assets() {
+        if (!$this->should_enqueue_public_assets()) {
+            return;
+        }
+
         $settings = get_option('beer_festival_settings', []);
         $refresh_interval = isset($settings['refresh_interval']) ? intval($settings['refresh_interval']) : 30;
         $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_beer_duration']) : 60;
@@ -152,11 +181,6 @@ class Beer_Festival_Public {
             'BFTLAds',
             $this->get_ads_payload()
         );
-    }
-
-    private function get_refresh_interval() {
-        $settings = get_option('beer_festival_settings', []);
-$new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_beer_duration']) : 5; // Default: 5 seconds
     }
 
     public function render_tap_list($atts) {
@@ -293,14 +317,14 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
     
     
 
-    private function is_new_beer($tapped_time, $settings) {
+    private static function is_new_beer($tapped_time, $settings) {
         if (!$tapped_time) return false;
         $duration = isset($settings['new_beer_duration']) ? intval($settings['new_beer_duration']) : 60;
         $tapped_timestamp = strtotime($tapped_time);
         return (time() - $tapped_timestamp) < $duration;
     }
 
-    public function get_tap_list_data() {
+    public static function get_tap_list_data() {
         $taps = Tap_Manager::get_all_taps();
         if (is_wp_error($taps)) {
             error_log('Tap List Error: ' . $taps->get_error_message());
@@ -344,7 +368,7 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
                     'brewer_location' => get_post_meta($beer->ID, '_beer_location', true),
                     'ibu' => get_post_meta($beer->ID, '_beer_ibu', true),
                     'abv' => get_post_meta($beer->ID, '_beer_abv', true),
-                    'is_new' => $this->is_new_beer($tap->tapped_time, $settings),
+                    'is_new' => self::is_new_beer($tap->tapped_time, $settings),
                     'is_empty' => false
                 ];
             } else {
@@ -360,5 +384,3 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
         return $data;
     }
 }
-
-new Beer_Festival_Public();

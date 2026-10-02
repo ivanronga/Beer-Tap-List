@@ -2,12 +2,15 @@
 /**
  * Plugin Name: Beer Festival Tap List
  * Description: Real-time tap list management for beer festivals
- * Version: 2.11.3
+ * Version: 2.12.0
  * Author: Beer Festival Tap List Contributors
  * Requires at least: 6.0
  * Requires PHP: 7.4
- * Tested up to: 6.6
+ * Tested up to: 7.1
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: beer-festival-tap
+ * Domain Path: /languages
  */
 
 // Security check
@@ -16,9 +19,14 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('BEER_FESTIVAL_VERSION', '2.11.3');
+define('BEER_FESTIVAL_VERSION', '2.12.0');
 define('BEER_FESTIVAL_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BEER_FESTIVAL_PLUGIN_URL', plugin_dir_url(__FILE__));
+
+add_action('init', 'beer_festival_load_textdomain');
+function beer_festival_load_textdomain() {
+    load_plugin_textdomain('beer-festival-tap', false, dirname(plugin_basename(__FILE__)) . '/languages');
+}
 
 // Activation/Deactivation hooks
 register_activation_hook(__FILE__, 'beer_festival_activate');
@@ -62,14 +70,16 @@ function beer_festival_init_plugin() {
         require_once BEER_FESTIVAL_PLUGIN_DIR . $file;
     }
 
+    // Tap changes arrive through the REST API (QR flow, Tap Management Save),
+    // which is not is_admin(), so the activity log listener must always be on.
+    require_once BEER_FESTIVAL_PLUGIN_DIR . 'includes/class-concurrent-edit.php';
+    new Beer_Festival_Concurrent_Edit();
+
     // Initialize admin and public components
     if (is_admin()) {
         global $beer_festival_settings;
         $beer_festival_settings = new Beer_Festival_Settings();
         new Beer_Festival_Admin();
-
-        require_once BEER_FESTIVAL_PLUGIN_DIR . 'includes/class-concurrent-edit.php';
-        new Beer_Festival_Concurrent_Edit();
     }
     new Beer_Festival_Public();
     new Beer_Festival_REST();
@@ -99,14 +109,4 @@ function beer_festival_maybe_upgrade() {
     update_option('beer_festival_db_version', BEER_FESTIVAL_VERSION);
 }
 
-// Handle uninstallation
-register_uninstall_hook(__FILE__, 'beer_festival_uninstall');
-
-function beer_festival_uninstall() {
-    if (!defined('BEER_FESTIVAL_PLUGIN_DIR')) {
-        return;
-    }
-    
-    // Custom uninstall logic from your requirements
-    require_once BEER_FESTIVAL_PLUGIN_DIR . 'uninstall.php';
-}
+// Uninstall cleanup lives in uninstall.php, which WordPress runs on its own.

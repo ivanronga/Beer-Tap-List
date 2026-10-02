@@ -1,0 +1,13 @@
+# Always store text files with LF, whatever the contributor's OS.
+* text=auto eol=lf
+
+# Binary assets
+*.woff2 binary
+*.png binary
+*.jpg binary
+
+# Dev-only files: left out of release archives (git archive).
+.gitattributes export-ignore
+.gitignore export-ignore
+README.md export-ignore
+languages/.gitkeep export-ignore
