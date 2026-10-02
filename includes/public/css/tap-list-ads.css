@@ -1,8 +1,21 @@
+/* The popup is appended to <body>, outside any plugin wrapper, so it sets
+   everything it relies on itself instead of inheriting from the theme. */
+.bftl-ad-popup,
+.bftl-ad-popup *,
+.bftl-ad-popup *::before,
+.bftl-ad-popup *::after {
+    box-sizing: border-box;
+}
 .bftl-ad-popup {
     position: fixed;
     z-index: 100001;
-    font-family: var(--ff-sans, sans-serif);
-    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: normal;
+    letter-spacing: normal;
+    text-transform: none;
+    color: #fff;
 
     /* Fade in/out. visibility (not display) keeps the transition running and
        takes the popup out of hit-testing once it has finished fading out. */
@@ -24,7 +37,7 @@
     right: 0;
     bottom: 0;
     width: 50%;
-    background: var(--row-bg, #22252d);
+    background: #22252d;
     box-shadow: -8px 0 24px rgba(0, 0, 0, 0.4);
 }
 .bftl-ad-popup-image-wrap {
@@ -38,8 +51,14 @@
     box-sizing: border-box;
 }
 .bftl-ad-popup-image {
+    display: block;
+    width: auto;
+    height: auto;
     max-width: 100%;
     max-height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
     object-fit: contain;
 }
 .bftl-ad-popup-close {
@@ -48,12 +67,19 @@
     right: 16px;
     width: 36px;
     height: 36px;
-    border-radius: var(--radius-full, 1000px);
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 1000px;
     background: rgba(0, 0, 0, 0.5);
     color: #fff;
-    border: none;
+    font-family: inherit;
     font-size: 20px;
+    font-weight: normal;
     line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    box-shadow: none;
     cursor: pointer;
 }
 
@@ -75,8 +101,8 @@
         width: 90vw;
         height: auto;
         max-height: 80vh;
-        background: var(--row-bg, #22252d);
-        border-radius: var(--radius-lrg, 8px);
+        background: #22252d;
+        border-radius: 8px;
         padding: 12px;
     }
     .bftl-ad-popup-close {
