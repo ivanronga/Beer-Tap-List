@@ -67,13 +67,23 @@ class Beer_Festival_Public {
     }
 
     /**
-     * Enabled marketing popup ads, mapped to the plain-array shape the
-     * front-end scheduler needs. Shared by the normal enqueue path and the
-     * iframe wrapper's doc.write() sequence so both stay in sync.
+     * Global popup timing plus the enabled ads, in the shape the front-end
+     * scheduler needs. Shared by the normal enqueue path and the iframe
+     * wrapper's doc.write() sequence so both stay in sync. When the master
+     * switch is off the ad list is empty, which makes the script do nothing.
      */
     private function get_ads_payload() {
+        $settings = Beer_Festival_Marketing_Popups::get_settings();
+        $payload = [
+            'interval_seconds' => intval($settings['interval_seconds']),
+            'duration_seconds' => intval($settings['duration_seconds']),
+            'ads'              => [],
+        ];
+        if (!$settings['enabled']) {
+            return $payload;
+        }
+
         $ads = Beer_Festival_Marketing_Popups::get_enabled_ordered();
-        $payload = [];
         if (is_wp_error($ads)) {
             return $payload;
         }
@@ -82,11 +92,10 @@ class Beer_Festival_Public {
             if (!$image_url) {
                 continue; // attachment was deleted -- skip rather than show a broken image
             }
-            $payload[] = [
-                'id'               => intval($ad->id),
-                'image_url'        => $image_url,
-                'interval_seconds' => intval($ad->interval_seconds),
-                'duration_seconds' => intval($ad->duration_seconds),
+            $payload['ads'][] = [
+                'id'        => intval($ad->id),
+                'image_url' => $image_url,
+                'weight'    => max(1, intval($ad->weight)),
             ];
         }
         return $payload;
@@ -141,7 +150,7 @@ class Beer_Festival_Public {
         wp_localize_script(
             'bftl-tap-list-ads',
             'BFTLAds',
-            array('ads' => $this->get_ads_payload())
+            $this->get_ads_payload()
         );
     }
 
@@ -268,7 +277,7 @@ $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_be
                     'css_url' => $this->get_asset_url('css/tap-list-styles.css')
                 ]) . ';<\/script>\');
                 doc.write(\'<script type="text/javascript" src="' . esc_url($this->get_asset_url('js/tap-list-ads.js')) . '"><\/script>\');
-                doc.write(\'<script type="text/javascript">var BFTLAds = ' . json_encode(['ads' => $this->get_ads_payload()]) . ';<\/script>\');
+                doc.write(\'<script type="text/javascript">var BFTLAds = ' . json_encode($this->get_ads_payload()) . ';<\/script>\');
                 doc.close();
             })();
             </script>';
