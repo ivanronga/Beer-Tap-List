@@ -70,6 +70,14 @@ class Beer_Festival_Settings {
         );
 
         add_settings_field(
+            'desktop_breakpoint',
+            __('Desktop Layout From (px)', 'beer-festival-tap'),
+            [$this, 'field_desktop_breakpoint'],
+            'beer-festival-settings',
+            'beer_festival_main_section'
+        );
+
+        add_settings_field(
             'frontend_wrapper',
             __('Frontend Wrapper', 'beer-festival-tap'),
             [$this, 'field_frontend_wrapper'],
@@ -131,6 +139,13 @@ class Beer_Festival_Settings {
         </p>
         <p class="description"><?php printf(esc_html__('%1$d–%2$d characters. Staff enter it once per phone; the phone remembers it. Changing the PIN here locks out every phone until its user enters the new one. Wrong guesses are rate limited per IP address.', 'beer-festival-tap'), Beer_Festival_Staff_Access::PIN_MIN_LEN, Beer_Festival_Staff_Access::PIN_MAX_LEN); ?></p>
         <?php
+    }
+
+    public function field_desktop_breakpoint() {
+        $value = Beer_Festival_Public::get_desktop_breakpoint();
+        echo '<input type="number" name="beer_festival_settings[desktop_breakpoint]" min="' . intval(Beer_Festival_Public::BREAKPOINT_MIN) . '" max="' . intval(Beer_Festival_Public::BREAKPOINT_MAX) . '" step="1" value="' . esc_attr($value) . '" />';
+        echo '<p class="description">' . esc_html__('Screens at least this wide (in CSS pixels) show the table-style desktop layout; narrower screens show the tap list as cards, 1 to 4 per row depending on width. Default 1440.', 'beer-festival-tap') . '</p>';
+        echo '<p class="description">' . esc_html__('Pick this for the display used at the event: a Full HD (1920 px) TV is 1920 wide, so any value up to 1920 gives it the desktop table; a larger value keeps cards. Check the browser\'s viewport width on the real screen.', 'beer-festival-tap') . '</p>';
     }
 
     public function field_frontend_wrapper() {
@@ -287,6 +302,29 @@ $new['frontend_wrapper'] = in_array($wrapper, $allowed_wrappers, true) ? $wrappe
         }
 
         // Staff access: master switch, then the optional shared PIN.
+        // Desktop layout breakpoint. Left alone when not submitted at all.
+        $stored_bp = isset($options['desktop_breakpoint']) ? intval($options['desktop_breakpoint']) : Beer_Festival_Public::BREAKPOINT_DEFAULT;
+        if (!isset($input['desktop_breakpoint'])) {
+            $new['desktop_breakpoint'] = $stored_bp;
+        } else {
+            $bp = intval($input['desktop_breakpoint']);
+            if ($bp < Beer_Festival_Public::BREAKPOINT_MIN || $bp > Beer_Festival_Public::BREAKPOINT_MAX) {
+                add_settings_error(
+                    $this->option_name,
+                    'desktop_breakpoint_invalid',
+                    sprintf(
+                        __('The desktop layout width must be between %1$d and %2$d pixels.', 'beer-festival-tap'),
+                        Beer_Festival_Public::BREAKPOINT_MIN,
+                        Beer_Festival_Public::BREAKPOINT_MAX
+                    ),
+                    'error'
+                );
+                $new['desktop_breakpoint'] = $stored_bp;
+            } else {
+                $new['desktop_breakpoint'] = $bp;
+            }
+        }
+
         // Fields that were not submitted at all (a programmatic update, not the
         // settings form) keep their stored value instead of resetting.
         if (!isset($input['staff_changes_enabled'])) {

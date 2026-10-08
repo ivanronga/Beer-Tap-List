@@ -5,6 +5,7 @@ class Beer_Festival_Public {
 
     public function __construct() {
         add_shortcode('beer_tap_list', [$this, 'render_tap_list']);
+        add_action('init', [$this, 'maybe_serve_styles'], 0);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_public_assets']);
         add_filter('single_template', [$this, 'load_single_beer_template']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_single_beer_assets']);
@@ -112,6 +113,116 @@ class Beer_Festival_Public {
         );
     }
 
+    const BREAKPOINT_DEFAULT = 1440;
+    const BREAKPOINT_MIN     = 480;
+    const BREAKPOINT_MAX     = 4000;
+
+    /**
+     * Width (px) from which the table-style desktop layout is used; below it
+     * the tap list is shown as cards. Set on the Settings page because the
+     * display used at the event is not known in advance.
+     */
+    public static function get_desktop_breakpoint() {
+        $settings = get_option('beer_festival_settings', []);
+        $bp = isset($settings['desktop_breakpoint']) ? intval($settings['desktop_breakpoint']) : self::BREAKPOINT_DEFAULT;
+        if ($bp < self::BREAKPOINT_MIN || $bp > self::BREAKPOINT_MAX) {
+            $bp = self::BREAKPOINT_DEFAULT;
+        }
+        return $bp;
+    }
+
+    /**
+     * URL of the board stylesheet with the configured breakpoint built in. A
+     * media query cannot read a setting, so the stylesheet is generated; the
+     * breakpoint and plugin version are in the URL, which makes the response
+     * safe to cache for a long time.
+     */
+    private function get_styles_url() {
+        return add_query_arg([
+            'bftl_css' => self::get_desktop_breakpoint(),
+            'ver'      => BEER_FESTIVAL_VERSION,
+        ], home_url('/'));
+    }
+
+    /**
+     * Cards flow into more columns as the screen widens. Each entry is the
+     * smallest width at which that column count fits (cards stay >= ~340px).
+     */
+    private static function column_steps() {
+        return [680 => 2, 1020 => 3, 1360 => 4];
+    }
+
+    // The column rules for a given desktop breakpoint: every range stops one
+    // pixel short of it, so the card rules never apply to the desktop layout.
+    private static function build_column_css($breakpoint) {
+        $last = $breakpoint - 1;
+        $starts = array_keys(self::column_steps());
+        if ($starts[0] > $last) {
+            return '';
+        }
+
+        $css = "@media (min-width:{$starts[0]}px) and (max-width:{$last}px){\n  .bftl-board .bftl-tap-list{ display:grid; }\n}\n";
+        foreach ($starts as $i => $start) {
+            $end = isset($starts[$i + 1]) ? min($starts[$i + 1] - 1, $last) : $last;
+            if ($start > $end) {
+                continue;
+            }
+            $cols = self::column_steps()[$start];
+            $css .= "@media (min-width:{$start}px) and (max-width:{$end}px){\n"
+                  . "  .bftl-board .bftl-tap-list{ grid-template-columns:repeat({$cols}, minmax(0, 1fr)); }\n"
+                  . "  .bftl-board .tap-item:not(:nth-child({$cols}n)){ border-right:1px solid #696969; }\n"
+                  . "}\n";
+        }
+        return $css;
+    }
+
+    /**
+     * The board stylesheet for a desktop breakpoint: the shipped file with its
+     * 1440px/1439px media queries rewritten, the column block regenerated, and
+     * relative asset URLs made absolute (it is not served from the css folder).
+     */
+    public static function build_styles_css($breakpoint) {
+        $css = file_get_contents(BEER_FESTIVAL_PLUGIN_DIR . 'includes/public/css/tap-list-styles.css');
+        if ($css === false) {
+            return '';
+        }
+
+        // strtr, not str_replace: it never re-scans its own output, so a
+        // breakpoint such as 1439 cannot be rewritten twice.
+        $css = strtr($css, [
+            self::BREAKPOINT_DEFAULT . 'px'       => $breakpoint . 'px',
+            (self::BREAKPOINT_DEFAULT - 1) . 'px' => ($breakpoint - 1) . 'px',
+        ]);
+
+        $css = preg_replace_callback(
+            '#/\* @bftl-columns:start \*/.*?/\* @bftl-columns:end \*/#s',
+            function () use ($breakpoint) {
+                return self::build_column_css($breakpoint);
+            },
+            $css
+        );
+
+        $assets_base = plugins_url('includes/public/', BEER_FESTIVAL_PLUGIN_DIR . 'beer-festival-tap-list.php');
+        return str_replace('url("../', 'url("' . $assets_base, $css);
+    }
+
+    public function maybe_serve_styles() {
+        if (!isset($_GET['bftl_css'])) {
+            return;
+        }
+
+        $breakpoint = intval($_GET['bftl_css']);
+        if ($breakpoint < self::BREAKPOINT_MIN || $breakpoint > self::BREAKPOINT_MAX) {
+            $breakpoint = self::BREAKPOINT_DEFAULT;
+        }
+
+        status_header(200);
+        header('Content-Type: text/css; charset=UTF-8');
+        header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: public, max-age=31536000, immutable');
+        echo self::build_styles_css($breakpoint);
+        exit;
+    }
     private function get_asset_url($relative_path) {
         return plugins_url('includes/public/' . $relative_path, BEER_FESTIVAL_PLUGIN_DIR . 'beer-festival-tap-list.php');
     }
@@ -173,9 +284,9 @@ class Beer_Festival_Public {
 
         wp_enqueue_style(
             'bftl-tap-list-styles',
-            $this->get_asset_url('css/tap-list-styles.css'),
+            $this->get_styles_url(),
             [],
-            BEER_FESTIVAL_VERSION
+            null // the version is already part of the generated URL
         );
 
         wp_enqueue_script(
@@ -193,7 +304,7 @@ class Beer_Festival_Public {
                 'rest_url' => rest_url('beer-festival-tap-list/v1/taps'),
                 'refresh_interval' => $refresh_interval,
                 'new_duration' => $new_duration,
-                'css_url' => $this->get_asset_url('css/tap-list-styles.css')
+                'css_url' => $this->get_styles_url()
             )
         );
 
@@ -357,7 +468,7 @@ class Beer_Festival_Public {
                 doc.open();
                 doc.write(\'<style>html,body{margin:0;padding:0;background:#22252d}</style>\');
                 doc.write(' . json_encode('<div class="bftl-board">' . $tap_list_html . '</div>') . ');
-                doc.write(\'<link rel="stylesheet" href="' . esc_url($this->get_asset_url('css/tap-list-styles.css')) . '">\');
+                doc.write(\'<link rel="stylesheet" href="' . esc_url($this->get_styles_url()) . '">\');
                 doc.write(\'<link rel="stylesheet" href="' . esc_url($this->get_asset_url('css/tap-list-ads.css')) . '">\');
                 doc.write(\'<script type="text/javascript" src="' . esc_url(includes_url('js/jquery/jquery.min.js')) . '"><\/script>\');
                 doc.write(\'<script type="text/javascript" src="' . esc_url($this->get_asset_url('js/tap-list-display.js')) . '"><\/script>\');
@@ -365,7 +476,7 @@ class Beer_Festival_Public {
                     'rest_url' => rest_url('beer-festival-tap-list/v1/taps'),
                     'refresh_interval' => 5,
                     'new_duration' => isset($settings['new_beer_duration']) ? intval($settings['new_beer_duration']) : 60,
-                    'css_url' => $this->get_asset_url('css/tap-list-styles.css')
+                    'css_url' => $this->get_styles_url()
                 ]) . ';<\/script>\');
                 doc.write(\'<script type="text/javascript" src="' . esc_url($this->get_asset_url('js/tap-list-ads.js')) . '"><\/script>\');
                 doc.write(\'<script type="text/javascript">var BFTLAds = ' . json_encode($this->get_ads_payload()) . ';<\/script>\');

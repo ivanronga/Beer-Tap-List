@@ -93,7 +93,7 @@
 }
 .bftl-board .bftl-tap-list{
   width:100%;
-}@media screen and (min-width:601px){.bftl-board .bftl-tap-list{
+}@media screen and (min-width:1440px){.bftl-board .bftl-tap-list{
     display:grid;
     gap:0;
     grid-template-columns:repeat(1, 1fr);
@@ -132,7 +132,7 @@
 .bftl-board .tap-stats{ display:contents; }
 .bftl-board .tap-stats .stat-label,
 .bftl-board .tap-stats .new-indicator--stats{ display:none; }
-@media (max-width:600px){
+@media (max-width:1439px){
   /* Mobile: every tap is a card (Figma "Tap list - mobile"): a coloured number
      strip on the left, then the beer name, style, brewer + location and the
      IBU / ABV chips stacked inside. Labels come from each field's data-label. */
@@ -243,8 +243,10 @@
   }
 
   .bftl-board .tap-stats{
+    align-items:center;
     display:flex;
-    gap:16px;
+    flex-wrap:wrap; /* the NEW! flag drops below the chips in a narrow column */
+    gap:12px 16px;
   }
   .bftl-board .tap-stats .tap-item--inner{
     align-items:center;
@@ -279,7 +281,7 @@
     min-width:0;
     padding:18px 12px;
   }
-}@media (min-width:601px){
+}@media (min-width:1440px){
   .bftl-board .tap-item{
     align-items:center;
     grid-auto-rows:minmax(48px, auto);
@@ -321,7 +323,7 @@
   line-height:4.5vh;
   text-align:center;
   width:4vh;
-}@media (max-width:600px){.bftl-board .tap-number{
+}@media (max-width:1439px){.bftl-board .tap-number{
     align-items:center;
     background-color:transparent !important;
     border-radius:0;
@@ -332,10 +334,10 @@
     line-height:normal;
     width:100%
 }
-  }@media (max-width:600px){.bftl-board .tap-item--inner.is-tap-number{
+  }@media (max-width:1439px){.bftl-board .tap-item--inner.is-tap-number{
     background-color:#fbb040
 }
-  }@media (min-width:601px){.bftl-board .tap-number{
+  }@media (min-width:1440px){.bftl-board .tap-number{
     border:3px solid #fff;
     font-size:26px;
     height:42px;
@@ -359,13 +361,13 @@
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-}@media (max-width:600px){.bftl-board .new-indicator{
+}@media (max-width:1439px){.bftl-board .new-indicator{
 	font-size:14px
 }
-  }@media (min-width:601px){.bftl-board .new-indicator{
+  }@media (min-width:1440px){.bftl-board .new-indicator{
     font-size:26px
 }
-  }@media (min-width:601px){.bftl-board .beer-style{
+  }@media (min-width:1440px){.bftl-board .beer-style{
     background-color:#fbb040;
     border-radius:50px;
     color:#000 !important;
@@ -384,7 +386,7 @@
   .bftl-board .tap-number[data-category="Dark"]{background-color:#000;color:#fff;}
   .bftl-board .tap-number[data-category="Sour"]{background-color:#d400ff;color:#fff;}
   .bftl-board .tap-number[data-category="Special"]{background-color:#07c9ff;color:#000;}
-  @media (max-width:600px){
+  @media (max-width:1439px){
     .bftl-board .tap-item--inner.is-tap-number[data-category="NEIPA/Hazy"]{background-color:#ff8c27;}
     .bftl-board .tap-item--inner.is-tap-number[data-category="IPA"]{background-color:#c01717;}
     .bftl-board .tap-item--inner.is-tap-number[data-category="Lager"]{background-color:#ffcc00;}
@@ -400,7 +402,7 @@
   .bftl-board .beer-style[data-category="Dark"]{color:#fff;}
   .bftl-board .beer-style[data-category="Sour"]{color:#d400ff;}
   .bftl-board .beer-style[data-category="Special"]{color:#07c9ff;}
-  @media (min-width:601px){
+  @media (min-width:1440px){
     .bftl-board .beer-style[data-category="NEIPA/Hazy"]{background-color:#ff8c27;color:#fff !important;}
     .bftl-board .beer-style[data-category="IPA"]{background-color:#c01717;color:#fff !important;}
     .bftl-board .beer-style[data-category="Lager"]{background-color:#ffcc00;color:#000 !important;}
@@ -410,7 +412,7 @@
     .bftl-board .beer-style[data-category="Special"]{background-color:#07c9ff;color:#000 !important;}
   }.bftl-board .abv{
   justify-content:flex-end;
-}@media (min-width:601px){
+}@media (min-width:1440px){
     .bftl-board .abv span{
       display:inline-block;
       width:80px;
@@ -431,7 +433,7 @@
   font-weight:var(--bftl-type-weight-bold);
   justify-content:center;
   padding:8px 12px;
-}@media (max-width:600px){.bftl-board .empty-tap--inner{
+}@media (max-width:1439px){.bftl-board .empty-tap--inner{
     font-size:12px;
     padding:6px 12px;
     text-transform:uppercase
@@ -464,7 +466,7 @@
     margin-right:var(--bftl-unit);
     vertical-align:top; 
     width:3vh;
-}@media (max-width:600px){.bftl-board .icon{
+}@media (max-width:1439px){.bftl-board .icon{
         background-size:24px;
         height:24px;
         margin-right:0;
@@ -480,7 +482,7 @@
         background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' width='48' height='48' fill='%23fff'%3E%3Cpath d='M28.8 9.1c.1-.3.1-.7.1-1 0-2.7-2.2-4.9-4.9-4.9s-4.9 2.2-4.9 4.9c0 .3 0 .7.1 1-6.6.7-11.3 2.6-11.4 4.7h32.3c.1-2.1-4.7-4-11.3-4.7M25.7 9h-3.4c-.1-.2-.2-.5-.2-.8 0-1 .8-1.9 1.9-1.9 1 0 1.9.8 1.9 1.9 0 .2-.1.5-.2.8M44.9 18.4h-4.7v-2.1H7.9v2.1H3.1c-1.4 0-2.5 1.1-2.5 2.5s1.1 2.5 2.5 2.5h4.7v14.8c0 2.3 1.8 4.1 4.1 4.1H36c2.3 0 4.1-1.8 4.1-4.1V23.4h4.7c1.4 0 2.5-1.1 2.5-2.5.1-1.4-1-2.5-2.4-2.5M14.2 37.3c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5V20.2c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5z'/%3E%3C/svg%3E");
     }.bftl-board .icon--craft{
         background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' fill='%2320b2aa' viewBox='0 0 48 48'%3E%3Cpath d='M1.8 13.2v-.6C1.8 6.4 4.1 4 7 4c.9 0 1.4.1 2 .4v3.2C8.4 7.2 7.8 7 7.3 7 5.9 7 5 8.2 5 12.6v.7c0 4.7 1 5.6 2.4 5.6.5 0 1.1-.2 1.7-.6v3c-.7.4-1.4.5-2.3.5-2.9.1-5-2.4-5-8.6M10.6 4.1h3.2c3.2 0 5.5 1.7 5.5 5.6v.3c0 2.3-.9 3.8-2.1 4.6l2.4 7.2h-3.3l-2-6.2h-.6v6.2h-3.1zm3.2 8.7c1.3 0 2.3-.8 2.3-2.9v-.1C16.1 7.6 15 7 13.7 7h-.1v5.9h.2zM23.1 4h3.3l3.4 17.7h-3.1l-.6-3.5h-2.8l-.6 3.5h-3zm2.5 11.5-.9-5.8-1 5.8zM30.7 4.1h6.4V7h-3.4v4.4h2.9v2.9h-2.9v7.4h-3.1V4.1zM40.2 7H38V4.1h7.4V7h-2.2v14.7h-3.1V7zM3.1 25.1h2.7c3 0 5.8 1.2 5.8 4.5v.1c0 2.3-1.3 3.4-2.6 4 1.5.7 2.8 1.7 2.8 3.9v.2c0 3.1-2.4 4.9-5.9 4.9H3.1zm3.1 7.4c1.4 0 2.3-.8 2.3-2.3v-.1c0-1.5-.9-2.2-2.3-2.2zm0 7.4c1.4 0 2.4-.8 2.4-2.3v-.1c0-1.5-1-2.3-2.4-2.3zM13 25.1h6.8V28h-3.7v4.4h3.3v2.9h-3.3v4.5h3.8v2.9H13zM21.4 25.1h6.8V28h-3.7v4.4h3.3v2.9h-3.3v4.5h3.8v2.9h-6.8V25.1zM29.7 25.1h3.2c3.2 0 5.5 1.7 5.5 5.6v.3c0 2.3-.9 3.8-2.1 4.6l2.4 7.2h-3.3l-2-6.2h-.6v6.2h-3.1zm3.2 8.7c1.3 0 2.3-.8 2.3-2.9v-.2c0-2.2-1.1-2.8-2.4-2.8h-.1v5.9z'/%3E%3C/svg%3E");
-    }@media (min-width:601px){
+    }@media (min-width:1440px){
   .bftl-board .tap-item--inner.beer-name,.bftl-board .tap-item--inner.abv,.bftl-board .tap-item--inner.ibu,.bftl-board .tap-item--inner.is-tap-number,.bftl-board .beer-style,.bftl-board .new-indicator{
     font-weight:var(--bftl-type-weight-bold);
   }
@@ -489,6 +491,27 @@
   }
 }
 
+/* @bftl-columns:start */
+/* The default 1440px desktop breakpoint is rewritten at serve time from the
+   Settings page, together with the column ranges below (see
+   Beer_Festival_Public::build_styles_css). This copy is the fallback.
 
-
-
+   Cards below 1440px: one per row on phones, then as many columns as fit
+   (cards stay at least ~340px wide): 2 from 680px, 3 from 1020px, 4 from 1360px.
+   The ranges are disjoint so each only has to describe its own column count. */
+@media (min-width:680px) and (max-width:1439px){
+  .bftl-board .bftl-tap-list{ display:grid; }
+}
+@media (min-width:680px) and (max-width:1019px){
+  .bftl-board .bftl-tap-list{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .bftl-board .tap-item:not(:nth-child(2n)){ border-right:1px solid #696969; }
+}
+@media (min-width:1020px) and (max-width:1359px){
+  .bftl-board .bftl-tap-list{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
+  .bftl-board .tap-item:not(:nth-child(3n)){ border-right:1px solid #696969; }
+}
+@media (min-width:1360px) and (max-width:1439px){
+  .bftl-board .bftl-tap-list{ grid-template-columns:repeat(4, minmax(0, 1fr)); }
+  .bftl-board .tap-item:not(:nth-child(4n)){ border-right:1px solid #696969; }
+}
+/* @bftl-columns:end */
