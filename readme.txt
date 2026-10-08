@@ -4,7 +4,7 @@ Tags: beer, festival, tap list, events
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.16.3
+Stable tag: 2.18.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,12 @@ your own protection if that is not acceptable.
 Its tables, options and temporary data are removed. Your Beer posts are kept.
 
 == Changelog ==
+
+= 2.18.0 =
+* New setting "Desktop Layout From (px)": choose the screen width at which the table-style desktop layout takes over from the cards (default 1440). The board stylesheet is generated with that value; the card column ranges adjust automatically.
+
+= 2.17.0 =
+* Tap list: the card layout now covers everything below 1440px. Cards flow into 1, 2, 3 or 4 columns depending on width (breakpoints 680, 1020 and 1360px); the original table-style layout is used from 1440px up.
 
 = 2.16.3 =
 * Mobile: the row spacing when the location wraps under the brewer now matches the spacing between the other blocks.
