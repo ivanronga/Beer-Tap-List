@@ -1,16 +1,119 @@
 jQuery(document).ready(function($) {
     "use strict";
 
+    // ---------- Staff access (switch / PIN) ----------
+    var PIN_KEY = 'bftl_staff_pin';
+    var staffPin = '';
+    try { staffPin = window.localStorage.getItem(PIN_KEY) || ''; } catch (e) { staffPin = ''; }
+
+    function rememberPin(pin) {
+        staffPin = pin;
+        try {
+            if (pin) { window.localStorage.setItem(PIN_KEY, pin); } else { window.localStorage.removeItem(PIN_KEY); }
+        } catch (e) { /* storage unavailable: the PIN just has to be re-entered next time */ }
+    }
+
+    function requestHeaders() {
+        var headers = { 'Content-Type': 'application/json' };
+        if (BeerSingle.rest_nonce) headers['X-WP-Nonce'] = BeerSingle.rest_nonce;
+        if (BeerSingle.access_mode === 'pin' && staffPin) headers['X-BFTL-Pin'] = staffPin;
+        return headers;
+    }
+
+    function parseError(response) {
+        return response.json().catch(function() { return {}; }).then(function(body) {
+            var err = new Error('Request failed');
+            err.status = response.status;
+            err.code = body && body.code;
+            return err;
+        });
+    }
+
     function assignTap(tapId, beerId) {
         return fetch(BeerSingle.assign_rest_url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: requestHeaders(),
             body: JSON.stringify({ tap_id: tapId, beer_id: beerId })
         }).then(function(response) {
             if (!response.ok) {
-                throw new Error('Request failed');
+                return parseError(response).then(function(err) { throw err; });
             }
             return response.json();
+        });
+    }
+
+    // Access was withdrawn (switch turned off, PIN changed) while the page was
+    // open: say so and reload into the matching state instead of a generic error.
+    function handleAccessLost(err) {
+        if (!err || (err.code !== 'bftl_changes_disabled' && err.code !== 'bftl_pin_required' && err.code !== 'bftl_pin_locked')) {
+            return false;
+        }
+        if (err.code === 'bftl_pin_required') rememberPin('');
+        window.alert(err.code === 'bftl_changes_disabled'
+            ? 'Promjene pipa trenutno su onemogućene.'
+            : (err.code === 'bftl_pin_locked'
+                ? 'Previše pogrešnih pokušaja. Pokušajte ponovno za nekoliko minuta.'
+                : 'PIN više nije valjan. Unesite novi PIN.'));
+        window.location.reload();
+        return true;
+    }
+
+    var app = document.querySelector('.bftl-beer-single-app');
+    var pinGate = document.getElementById('bftlPinGate');
+    if (pinGate && app) {
+        var pinInput = document.getElementById('bftlPinInput');
+        var pinError = document.getElementById('bftlPinError');
+        var pinSubmit = document.getElementById('bftlPinSubmit');
+
+        function showPinError(message) {
+            pinError.textContent = message;
+            pinError.hidden = !message;
+        }
+
+        function unlock() {
+            app.classList.remove('is-pin-locked');
+        }
+
+        function verifyPin(pin) {
+            return fetch(BeerSingle.verify_rest_url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-BFTL-Pin': pin }
+            }).then(function(response) {
+                if (!response.ok) {
+                    return parseError(response).then(function(err) { throw err; });
+                }
+                return true;
+            });
+        }
+
+        // A phone that already entered the PIN unlocks silently.
+        if (staffPin) {
+            verifyPin(staffPin).then(unlock).catch(function(err) {
+                if (err && err.code === 'bftl_changes_disabled') { window.location.reload(); return; }
+                if (err && err.code === 'bftl_pin_required') rememberPin('');
+            });
+        }
+
+        pinGate.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (pinSubmit.disabled) return; // a check is already in flight
+            var pin = pinInput.value.trim();
+            if (!pin) { showPinError('Unesite PIN.'); return; }
+            showPinError('');
+            pinSubmit.disabled = true;
+            verifyPin(pin).then(function() {
+                rememberPin(pin);
+                pinInput.value = '';
+                showPinError('');
+                unlock();
+            }).catch(function(err) {
+                if (err && err.code === 'bftl_changes_disabled') { window.location.reload(); return; }
+                showPinError(err && err.code === 'bftl_pin_locked'
+                    ? 'Previše pogrešnih pokušaja. Pokušajte ponovno za nekoliko minuta.'
+                    : 'Pogrešan PIN.');
+            }).then(function() {
+                pinSubmit.disabled = false;
+            });
         });
     }
 
@@ -198,7 +301,8 @@ jQuery(document).ready(function($) {
                 showLoading(this.loadingText);
                 assignTap(tapId, BeerSingle.beer_id).then(function() {
                     window.location.reload();
-                }).catch(function() {
+                }).catch(function(err) {
+                    if (handleAccessLost(err)) return;
                     hideLoading();
                     trigger.disabled = false;
                     window.alert('Greška prilikom objave piva na pipu. Pokušajte ponovno.');
@@ -223,7 +327,8 @@ jQuery(document).ready(function($) {
                 });
                 chain.then(function() {
                     window.location.reload();
-                }).catch(function() {
+                }).catch(function(err) {
+                    if (handleAccessLost(err)) return;
                     hideLoading();
                     trigger.disabled = false;
                     window.alert('Greška prilikom uklanjanja piva s pipe. Pokušajte ponovno.');

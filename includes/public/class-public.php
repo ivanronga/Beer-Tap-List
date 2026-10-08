@@ -102,7 +102,12 @@ class Beer_Festival_Public {
             [
                 'beer_id'          => $beer_id,
                 'assign_rest_url'  => rest_url('beer-festival-tap-list/v1/taps/assign'),
+                'verify_rest_url'  => rest_url('beer-festival-tap-list/v1/staff/verify'),
                 'current_tap_ids'  => $current_tap_ids,
+                'access_mode'      => Beer_Festival_Staff_Access::page_mode(),
+                // A logged-in administrator is recognised by the REST nonce and
+                // so is never blocked by the staff switch or PIN.
+                'rest_nonce'       => Beer_Festival_Staff_Access::is_admin_user() ? wp_create_nonce('wp_rest') : '',
             ]
         );
     }

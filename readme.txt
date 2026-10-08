@@ -4,7 +4,7 @@ Tags: beer, festival, tap list, events
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.14.0
+Stable tag: 2.15.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,9 @@ your own protection if that is not acceptable.
 Its tables, options and temporary data are removed. Your Beer posts are kept.
 
 == Changelog ==
+
+= 2.15.0 =
+* Staff access control: new Settings section "Staff Access (Beer Pages)" with a switch to turn tap changes from beer pages off completely, and an optional shared staff PIN (rate limited per IP). Enforced on the server; logged-in administrators and Tap Management are never affected.
 
 = 2.14.0 =
 * QR Codes page: "Download all as ZIP" bundles a plain QR image per beer (JSZip is bundled, nothing is loaded from the internet).

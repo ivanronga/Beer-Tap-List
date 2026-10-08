@@ -617,3 +617,45 @@ html {
 .bftl-tap-chosen[data-category="Special"] {
     color: #000;
 }
+
+/* ---------- Staff PIN gate / read-only mode ---------- */
+.bftl-pin-gate {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    align-self: stretch;
+    width: 100%;
+}
+.bftl-beer-single-app.is-pin-locked .bftl-pin-gate {
+    display: flex;
+}
+/* Until the PIN is accepted, the picker and the footer actions stay hidden. */
+.bftl-beer-single-app.is-pin-locked .bftl-tap-field:not(.is-published),
+.bftl-beer-single-app.is-pin-locked .bftl-beer-single-actions {
+    display: none;
+}
+.bftl-pin-input {
+    width: 100%;
+    min-height: 60px;
+    padding: 10px 24px;
+    border: 0;
+    border-radius: 12px;
+    background: #fff;
+    color: var(--bftl-ink);
+    font: inherit;
+    font-size: 18px;
+    font-weight: 700;
+    box-sizing: border-box;
+}
+.bftl-pin-input:focus-visible {
+    outline: 3px solid var(--bftl-mint);
+    outline-offset: 2px;
+}
+.bftl-pin-error {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ff9b9b;
+}
+.bftl-pin-error[hidden] {
+    display: none;
+}
