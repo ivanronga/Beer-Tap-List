@@ -2,13 +2,14 @@
 /**
  * Plugin Name: Beer Festival Tap List
  * Description: Real-time tap list management for beer festivals
- * Version: 2.18.1
+ * Version: 2.19.0
  * Author: Beer Festival Tap List Contributors
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Tested up to: 7.1
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Update URI: https://github.com/ivanronga/Beer-Tap-List
  * Text Domain: beer-festival-tap
  * Domain Path: /languages
  */
@@ -19,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('BEER_FESTIVAL_VERSION', '2.18.1');
+define('BEER_FESTIVAL_VERSION', '2.19.0');
 define('BEER_FESTIVAL_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BEER_FESTIVAL_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -62,6 +63,7 @@ function beer_festival_init_plugin() {
         'includes/class-tap-manager.php', // Tap management
         'includes/class-staff-access.php', // Who may change taps from beer pages
         'includes/class-settings.php',    // Plugin settings
+        'includes/class-updater.php',     // Updates from GitHub tags
         'includes/admin/class-admin.php',          // Admin interface
         'includes/public/class-public.php',        // Frontend display
         'includes/class-rest-api.php'              // REST API endpoints
@@ -84,6 +86,7 @@ function beer_festival_init_plugin() {
     }
     new Beer_Festival_Public();
     new Beer_Festival_REST();
+    new Beer_Festival_Updater();
 
     add_action('init', 'beer_festival_maybe_upgrade', 20);
 }

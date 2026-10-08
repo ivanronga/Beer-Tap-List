@@ -35,4 +35,21 @@ A WordPress plugin for real-time tap list management at beer festivals. Manage a
 - **Uninstall.** Deleting the plugin removes its tables, options and temporary data. Beer posts are kept.
 - **Fonts.** Figtree is bundled in `includes/public/fonts/` (SIL Open Font License); nothing is loaded from Google by the plugin.
 
+## Releasing and updates
+
+The plugin updates itself from this repository: WordPress checks GitHub for the newest `vX.Y.Z` **tag** and offers it as a normal plugin update (one click, or auto-update). Nothing is built or uploaded per release.
+
+To publish a version:
+
+1. Bump the version in `beer-festival-tap-list.php` (the `Version:` header **and** `BEER_FESTIVAL_VERSION`), then `readme.txt` (`Stable tag` and a changelog entry).
+2. Commit, merge to `main`, then `git tag -a vX.Y.Z -m "..."` and `git push origin main vX.Y.Z`.
+3. The site shows the update within about 3 hours, or immediately via **Plugins → Check for updates**.
+
+Notes:
+
+- Only plain `vX.Y.Z` tags count; the highest version wins.
+- GitHub's tag archive is used as the package. `.gitattributes` `export-ignore` keeps dev-only files out of it, and the updater renames its `Beer-Tap-List-X.Y.Z/` folder to `beer-festival-tap-list/` during the upgrade.
+- A folder containing `.git` (a development checkout) is never offered updates, because an update replaces the whole folder. Add `define('BFTL_FORCE_UPDATES', true);` to `wp-config.php` to override.
+- The first version that contains the updater (2.19.0) has to be installed by zip once; later versions arrive through WordPress.
+
 See `readme.txt` for the changelog.

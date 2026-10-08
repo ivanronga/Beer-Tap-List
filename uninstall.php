@@ -28,5 +28,12 @@ $wpdb->query($wpdb->prepare(
     $wpdb->esc_like('_transient_timeout_bftl_import_') . '%'
 ));
 
+// Cached GitHub update checks and changelogs.
+$wpdb->query($wpdb->prepare(
+    "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
+    $wpdb->esc_like('_transient_bftl_update_') . '%',
+    $wpdb->esc_like('_transient_timeout_bftl_update_') . '%'
+));
+
 // Beer posts and their meta are deliberately kept, so removing or reinstalling
 // the plugin never destroys the beer list.
