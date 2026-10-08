@@ -3,6 +3,25 @@ jQuery(document).ready(function($) {
     let autoRefresh = null;
     let badgeTimeouts = {};
 
+    // Same card structure the server renders (see render_tap_list()), so a tap
+    // that gets a beer after page load looks identical to one rendered with it.
+    function buildTapBody() {
+        const label = key => $('<div>').text(container.data('label-' + key) || '').html();
+        return `
+            <div class="tap-body">
+                <div class="tap-item--inner beer-name" data-label="${label('name')}"></div>
+                <div class="tap-item--inner is-beer-style" data-label="${label('style')}"><div class="beer-style"></div></div>
+                <div class="tap-meta">
+                    <div class="tap-item--inner brewer-name" data-label="${label('brewer')}"></div>
+                    <div class="tap-item--inner brewer-location" data-label="${label('location')}"></div>
+                </div>
+                <div class="tap-stats">
+                    <div class="tap-item--inner ibu"><i class="icon icon--hops"></i> <span class="stat-label">IBU</span> <span class="ibu--inner"></span></div>
+                    <div class="tap-item--inner abv"><i class="icon icon--flask"></i> <span class="stat-label">ABV</span> <span class="abv--inner"></span></div>
+                </div>
+            </div>`;
+    }
+
     function refreshTapList() {
         fetch(BFTLFront.rest_url)
             .then(response => response.json())
@@ -14,7 +33,7 @@ jQuery(document).ready(function($) {
                         if ($tap.length) {
                             if (tap.is_empty) {
                                 // Clear all content except tap number
-                                $tap.find('.beer-name, .beer-style, .brewer-name, .brewer-location, .ibu, .abv, .new-indicator').remove();
+                                $tap.find('.tap-body, .beer-name, .beer-style, .brewer-name, .brewer-location, .ibu, .abv, .new-indicator').remove();
                                 $tap.removeClass('new-beer');
                                 $tap.find('.tap-number, .is-tap-number').attr('data-category', tap.zone_category || '');
 
@@ -28,14 +47,7 @@ jQuery(document).ready(function($) {
                                 
                                 // Ensure beer details structure exists
                                 if (!$tap.find('.beer-name').length) {
-                                    $tap.append(`
-                                        <div class="tap-item--inner beer-name"></div>
-                                        <div class="tap-item--inner beer-style__wrap"><div class="beer-style"></div></div>
-                                        <span class="tap-item--inner brewer-name"></span>
-                                        <span class="tap-item--inner brewer-location"></span>
-                                        <span class="tap-item--inner ibu"><i class="icon icon--hops"></i><span class="ibu--inner"></span></span>
-                                        <span class="tap-item--inner abv"><i class="icon icon--flask"></i><span class="abv--inner"></span></span>
-                                    `);
+                                    $tap.append(buildTapBody());
                                 }
                                 
                                 // Update beer name
@@ -53,8 +65,13 @@ jQuery(document).ready(function($) {
                                 // Handle new beer indicator independently for each tap
                                 if (tap.is_new) {
                                     // Only add new indicator if it doesn't exist
-                                    if (!$tap.find('.new-indicator').length) {
-                                        $beerName.append(' <div class="new-indicator">NEW!</div>');
+                                    if (!$tap.find('.new-indicator--name').length) {
+                                        // Two copies, same as the server renders: beside the name
+                                        // (wide screens) and in the IBU/ABV row (mobile).
+                                        $beerName.append(' <div class="new-indicator new-indicator--name">NEW!</div>');
+                                        if (!$tap.find('.new-indicator--stats').length) {
+                                            $tap.find('.tap-stats').append('<div class="new-indicator new-indicator--stats">NEW!</div>');
+                                        }
                                         $tap.addClass('new-beer');
                                         
                                         // Set timeout only if this is a new indicator

@@ -4,7 +4,7 @@ Tags: beer, festival, tap list, events
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.15.0
+Stable tag: 2.16.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,21 @@ your own protection if that is not acceptable.
 Its tables, options and temporary data are removed. Your Beer posts are kept.
 
 == Changelog ==
+
+= 2.16.3 =
+* Mobile: the row spacing when the location wraps under the brewer now matches the spacing between the other blocks.
+
+= 2.16.2 =
+* Mobile: brewer and location sit side by side while they fit; otherwise the location drops to its own row and very long names wrap instead of being cut off with an ellipsis.
+
+= 2.16.1 =
+* Mobile: the "NEW!" flag now sits in the IBU/ABV row, as in the design; wide screens still show it beside the beer name.
+* Smaller gap between the IBU/ABV icons and their text.
+* The IBU and ABV labels are shown on mobile only again (an older style rule was un-hiding them on wide screens).
+
+= 2.16.0 =
+* Mobile tap list redesigned: each tap is a card with the beer name, style, brewer, location and IBU/ABV chips, plus a colour-coded number strip and the new-beer highlight. Desktop is unchanged.
+* The live-refresh script now builds the same markup as the server, so a tap that gets a beer after the page loaded looks identical.
 
 = 2.15.0 =
 * Staff access control: new Settings section "Staff Access (Beer Pages)" with a switch to turn tap changes from beer pages off completely, and an optional shared staff PIN (rate limited per IP). Enforced on the server; logged-in administrators and Tap Management are never affected.

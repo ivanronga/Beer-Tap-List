@@ -124,86 +124,161 @@
 }.bftl-board .tap-item--inner.abv,.bftl-board .tap-item--inner.ibu,.bftl-board .tap-item--inner.is-tap-number{
   font-weight:var(--bftl-type-weight-extrabold);
   text-align:center;
-}.bftl-board .tap-item--inner.is-tap-number{ grid-area:is-tap-number; justify-content:center; }.bftl-board .tap-item--inner.beer-name{ grid-area:beer-name; }.bftl-board .tap-item--inner.is-beer-style{ grid-area:is-beer-style; }.bftl-board .tap-item--inner.brewer-name{ grid-area:brewer-name; }.bftl-board .tap-item--inner.brewer-location{ grid-area:brewer-location; }.bftl-board .tap-item--inner.ibu{ grid-area:ibu; }.bftl-board .tap-item--inner.abv{ grid-area:abv; }@media (max-width:600px){
-  .bftl-board .tap-item--inner.brewer-name,.bftl-board .tap-item--inner.brewer-location{ font-size:14px; font-weight:var(--bftl-type-weight-semibold); }
-  .bftl-board .tap-item--inner.beer-name,.bftl-board .tap-item--inner.abv,.bftl-board .tap-item--inner.ibu{ font-size:16px; }
+}.bftl-board .tap-item--inner.is-tap-number{ grid-area:is-tap-number; justify-content:center; }.bftl-board .tap-item--inner.beer-name{ grid-area:beer-name; }.bftl-board .tap-item--inner.is-beer-style{ grid-area:is-beer-style; }.bftl-board .tap-item--inner.brewer-name{ grid-area:brewer-name; }.bftl-board .tap-item--inner.brewer-location{ grid-area:brewer-location; }.bftl-board .tap-item--inner.ibu{ grid-area:ibu; }.bftl-board .tap-item--inner.abv{ grid-area:abv; }
+/* The card wrappers only matter on mobile. Elsewhere they vanish from layout so
+   the fields stay direct grid items of the row. */
+.bftl-board .tap-body,
+.bftl-board .tap-meta,
+.bftl-board .tap-stats{ display:contents; }
+.bftl-board .tap-stats .stat-label,
+.bftl-board .tap-stats .new-indicator--stats{ display:none; }
+@media (max-width:600px){
+  /* Mobile: every tap is a card (Figma "Tap list - mobile"): a coloured number
+     strip on the left, then the beer name, style, brewer + location and the
+     IBU / ABV chips stacked inside. Labels come from each field's data-label. */
   .bftl-board .tap-item{
-    border-bottom:3px solid #919296;
-    grid-template-areas:"is-tap-number beer-name      beer-name        ibu  abv" "is-tap-number is-beer-style  is-beer-style    ibu  abv" "is-tap-number brewer-name    brewer-location  ibu  abv";
-    grid-template-columns:43px minmax(48px,auto) minmax(48px,auto) 51px 51px;
-  }
-  /* Brewer and location size to their content (each row is its own grid, so a
-     short brewer hands its spare width to a long location, and vice versa).
-     The beer name and style span both columns; zero intrinsic width keeps their
-     length from driving the column sizes. */
-  .bftl-board .tap-item--inner.beer-name,.bftl-board .tap-item--inner.is-beer-style{
-    min-width:100%;
-    width:0;
-  }
-
-  .bftl-board .tap-item--inner{
-    border:none;
-    padding:12px;
+    align-items:stretch;
+    background:var(--bftl-row-bg);
+    border-bottom:1px solid #696969;
+    display:flex;
+    gap:0;
   }
   .bftl-board .tap-item--inner.is-tap-number{
+    align-items:center;
+    align-self:stretch;
     border-right:1px solid #919296;
-  }
-  .bftl-board .tap-item--inner.beer-name{
-    background-color:#22252d;
-    border-bottom:1px solid #96979b;
-    padding:12px 24px;
-  }
-  .bftl-board .tap-item--inner.is-beer-style{
-    background-color:#22252d;
-    border-bottom:1px solid #919296;
-    height:49px;
-    padding:12px 24px;
-  }
-  .bftl-board .tap-item--inner.brewer-name{
-    background-color:#22252d;
-    min-width:0;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-  }
-  .bftl-board .tap-item--inner.brewer-location{
-    background-color:#22252d;
-    border-left:1px solid #919296;
-    min-width:0;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-  }
-  .bftl-board .tap-item--inner.ibu,.bftl-board .tap-item--inner.abv{
-    background-color:#22252d;
-    border-left:1px solid #919296;
-    gap:10px;
-    padding:12px 6px;
-  }
-  .bftl-board .tap-item.new-beer .tap-item--inner.beer-name,.bftl-board .tap-item.new-beer .tap-item--inner.is-beer-style,.bftl-board .tap-item.new-beer .tap-item--inner.brewer-name,.bftl-board .tap-item.new-beer .tap-item--inner.brewer-location,.bftl-board .tap-item.new-beer .tap-item--inner.ibu,.bftl-board .tap-item.new-beer .tap-item--inner.abv{
-    background-color:transparent !important;
-  }
-
-  .bftl-board .tap-item--inner.is-beer-style{
-    align-items:center;
     display:flex;
-    height:100%;
-    text-align:left;
-  }
-
-  .bftl-board .tap-item--inner.beer-name,.bftl-board .tap-item--inner.brewer-location,.bftl-board .tap-item--inner.brewer-name{
-    height:100%;
-    text-align:left;
-  }
-
-  .bftl-board .tap-item--inner.abv,.bftl-board .tap-item--inner.ibu,.bftl-board .tap-item--inner.is-tap-number{
-    align-items:center;
-    display:flex;
-    flex-direction:column;
-    height:100%;
+    flex:0 0 43px;
     justify-content:center;
+    padding:0 12px;
+    width:43px;
+  }
+  .bftl-board .tap-item .tap-number[data-category]{ color:#fff; font-weight:var(--bftl-type-weight-bold); }
+  .bftl-board .tap-item .tap-number[data-category="Lager"]{ color:#000; }
+
+  .bftl-board .tap-body{
+    background:var(--bftl-row-bg);
+    display:flex;
+    flex:1 1 0;
+    flex-direction:column;
+    gap:12px;
+    line-height:normal;
+    min-width:0;
+    padding:24px;
+  }
+  .bftl-board .tap-item.new-beer .tap-body{ background:transparent; }
+  .bftl-board .bftl-tap-list .tap-item.new-beer{
+    background:radial-gradient(480px 480px at 100% 0%, #1dbd7d 0%, #158a5b 50%, #0d5739 100%) !important;
   }
 
+  .bftl-board .tap-body .tap-item--inner{
+    background:none;
+    border:0;
+    display:block;
+    height:auto;
+    line-height:normal;
+    min-width:0;
+    padding:4px 0;
+    text-align:left;
+  }
+  .bftl-board .tap-body .tap-item--inner[data-label]::before{
+    content:attr(data-label);
+    display:block;
+    font-size:14px;
+    font-weight:var(--bftl-type-weight-regular);
+    line-height:normal;
+    opacity:.5;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .bftl-board .tap-body .tap-item--inner.beer-name{
+    font-size:var(--bftl-type-large);
+    font-weight:var(--bftl-type-weight-extrabold);
+    overflow:visible;
+    white-space:normal;
+  }
+  .bftl-board .tap-body .new-indicator--name{ display:none; }
+  .bftl-board .tap-stats .new-indicator--stats{
+    align-self:center;
+    display:flex;
+    flex:0 0 auto;
+    font-size:14px;
+    letter-spacing:-.7px;
+    line-height:normal;
+    margin:0;
+    /* Figma: 10px all round around cap-height-trimmed text = 30px tall. */
+    padding:6px 10px;
+  }
+
+  .bftl-board .tap-item .tap-body .beer-style{
+    background:none;
+    border-radius:0;
+    color:var(--bftl-color-text);
+    display:block;
+    font-size:var(--bftl-type-small);
+    font-weight:var(--bftl-type-weight-extrabold);
+    letter-spacing:normal;
+    padding:0;
+    text-transform:none;
+  }
+
+  /* Brewer and location sit side by side while they fit. When they do not, the
+     location drops to its own row, and a single very long value wraps onto
+     further lines instead of being cut off with an ellipsis. */
+  .bftl-board .tap-meta{
+    column-gap:12px;
+    display:flex;
+    flex-wrap:wrap;
+    min-width:0;
+    row-gap:12px; /* same spacing as between the other blocks of the card */
+  }
+  .bftl-board .tap-meta .tap-item--inner{
+    flex:0 1 auto;
+    font-size:var(--bftl-type-small);
+    font-weight:var(--bftl-type-weight-semibold);
+    max-width:100%;
+    overflow-wrap:anywhere;
+    white-space:normal;
+  }
+
+  .bftl-board .tap-stats{
+    display:flex;
+    gap:16px;
+  }
+  .bftl-board .tap-stats .tap-item--inner{
+    align-items:center;
+    background:rgba(255,255,255,.2);
+    border-radius:8px;
+    display:flex;
+    flex:0 0 auto;
+    flex-direction:row;
+    font-size:var(--bftl-type-small);
+    font-weight:var(--bftl-type-weight-semibold);
+    gap:0;
+    justify-content:flex-start;
+    padding:8px;
+  }
+  .bftl-board .tap-stats .stat-label{ margin-left:4px; }
+  .bftl-board .tap-stats .ibu--inner,
+  .bftl-board .tap-stats .abv--inner{ margin-left:8px; }
+  .bftl-board .tap-stats .icon--hops{ background-image:url("../images/icon-hops.svg"); }
+  .bftl-board .tap-stats .icon--flask{ background-image:url("../images/icon-flask.svg"); }
+  .bftl-board .tap-stats .stat-label{
+    display:inline;
+    font-size:14px;
+    font-weight:var(--bftl-type-weight-regular);
+    opacity:.75;
+  }
+
+  .bftl-board .tap-item--inner.empty-tap{
+    align-items:center;
+    display:flex;
+    flex:1 1 0;
+    justify-content:center;
+    min-width:0;
+    padding:18px 12px;
+  }
 }@media (min-width:601px){
   .bftl-board .tap-item{
     align-items:center;
@@ -287,17 +362,6 @@
 }@media (max-width:600px){.bftl-board .new-indicator{
 	font-size:14px
 }
-  }@media (max-width:600px){.bftl-board .beer-style{
-    background-color:#fbb040;
-    border-radius:50px;
-    color:#000 !important;
-    display:inline-block;
-    font-size:12px;
-    opacity:1;
-    padding:6px 12px;
-    text-align:center;
-    text-transform:uppercase
-}
   }@media (min-width:601px){.bftl-board .new-indicator{
     font-size:26px
 }
@@ -344,14 +408,6 @@
     .bftl-board .beer-style[data-category="Dark"]{background-color:#fff;color:#22252d !important;}
     .bftl-board .beer-style[data-category="Sour"]{background-color:#d400ff;color:#fff !important;}
     .bftl-board .beer-style[data-category="Special"]{background-color:#07c9ff;color:#000 !important;}
-  }@media (max-width:600px){
-    .bftl-board .beer-style[data-category="NEIPA/Hazy"]{background-color:#ff8c27;color:#fff !important;}
-    .bftl-board .beer-style[data-category="IPA"]{background-color:#c01717;color:#fff !important;}
-    .bftl-board .beer-style[data-category="Lager"]{background-color:#ffcc00;color:#000 !important;}
-    .bftl-board .beer-style[data-category="Pale Ale"]{background-color:#ae5100;color:#fff !important;}
-    .bftl-board .beer-style[data-category="Dark"]{background-color:#fff;color:#22252d !important;}
-    .bftl-board .beer-style[data-category="Sour"]{background-color:#d400ff;color:#fff !important;}
-    .bftl-board .beer-style[data-category="Special"]{background-color:#07c9ff;color:#000 !important;}
   }.bftl-board .abv{
   justify-content:flex-end;
 }@media (min-width:601px){
@@ -363,10 +419,6 @@
       display:inline-block;
       width:50px;
     }
-  }@media (max-width:600px){.bftl-board .empty-tap{
-    grid-column:2 /  6;
-    width:100%
-}
   }.bftl-board .empty-tap--inner,.bftl-board .new-indicator{
   border-radius:50px;
   font-family:var(--bftl-ff-no);
@@ -409,7 +461,7 @@
     display:inline-block;
     flex-shrink:0;
     height:3vh;
-    margin-right:calc(var(--bftl-unit)*2);
+    margin-right:var(--bftl-unit);
     vertical-align:top; 
     width:3vh;
 }@media (max-width:600px){.bftl-board .icon{
