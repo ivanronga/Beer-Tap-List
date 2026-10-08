@@ -4,7 +4,7 @@ Tags: beer, festival, tap list, events
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.18.0
+Stable tag: 2.18.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,9 @@ your own protection if that is not acceptable.
 Its tables, options and temporary data are removed. Your Beer posts are kept.
 
 == Changelog ==
+
+= 2.18.1 =
+* Fixed marketing popups needing two clicks to close in iframe mode: the popup script was loaded both in the page and inside the iframe, so two popups opened on top of each other. The page no longer loads the board scripts and styles when the iframe wrapper is used.
 
 = 2.18.0 =
 * New setting "Desktop Layout From (px)": choose the screen width at which the table-style desktop layout takes over from the cards (default 1440). The board stylesheet is generated with that value; the card column ranges adjust automatically.

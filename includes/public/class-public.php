@@ -279,6 +279,15 @@ class Beer_Festival_Public {
         }
 
         $settings = get_option('beer_festival_settings', []);
+
+        // In iframe mode the board, its refresh script and the popups all run
+        // inside the iframe, which loads its own copies (see render_tap_list()).
+        // Loading them in the surrounding page as well would create a second
+        // popup stacked on top of the iframe's, needing two clicks to close.
+        if (isset($settings['frontend_wrapper']) && $settings['frontend_wrapper'] === 'iframe') {
+            return;
+        }
+
         $refresh_interval = isset($settings['refresh_interval']) ? intval($settings['refresh_interval']) : 30;
         $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_beer_duration']) : 60;
 
