@@ -4,7 +4,7 @@ Tags: beer, festival, tap list, events
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.18.1
+Stable tag: 2.19.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,9 @@ your own protection if that is not acceptable.
 Its tables, options and temporary data are removed. Your Beer posts are kept.
 
 == Changelog ==
+
+= 2.19.0 =
+* The plugin now updates itself from GitHub: when a new version tag is published, WordPress shows the normal "Update available" notice and can update (or auto-update) with one click. A "Check for updates" link on the Plugins page checks immediately.
 
 = 2.18.1 =
 * Fixed marketing popups needing two clicks to close in iframe mode: the popup script was loaded both in the page and inside the iframe, so two popups opened on top of each other. The page no longer loads the board scripts and styles when the iframe wrapper is used.
