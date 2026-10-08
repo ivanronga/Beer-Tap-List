@@ -21,8 +21,11 @@ class Beer_Festival_Marketing_Popups {
         $charset_collate = $wpdb->get_charset_collate();
 
         // dbDelta can't rename or drop columns, so earlier schemas are converted
-        // in place before it runs. v2.10.0-2.10.4 stored the interval in minutes.
-        $has_minutes = $wpdb->get_var("SHOW COLUMNS FROM $table_name LIKE 'interval_minutes'");
+        // in place before it runs. On a fresh install there is nothing to convert.
+        $table_exists = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table_name)) === $table_name;
+
+        // v2.10.0-2.10.4 stored the interval in minutes.
+        $has_minutes = $table_exists && $wpdb->get_var("SHOW COLUMNS FROM $table_name LIKE 'interval_minutes'");
         if ($has_minutes) {
             $wpdb->query("ALTER TABLE $table_name CHANGE interval_minutes interval_seconds INT UNSIGNED NOT NULL DEFAULT 900");
             $wpdb->query("UPDATE $table_name SET interval_seconds = interval_seconds * 60");
@@ -30,7 +33,7 @@ class Beer_Festival_Marketing_Popups {
 
         // v2.10.5-2.10.6 stored interval/duration per ad; they are now global
         // settings. Seed the global values from the first ad, then drop the columns.
-        $has_per_ad_timing = $wpdb->get_var("SHOW COLUMNS FROM $table_name LIKE 'interval_seconds'");
+        $has_per_ad_timing = $table_exists && $wpdb->get_var("SHOW COLUMNS FROM $table_name LIKE 'interval_seconds'");
         if ($has_per_ad_timing) {
             if (get_option(self::SETTINGS_OPTION, null) === null) {
                 $first = $wpdb->get_row("SELECT interval_seconds, duration_seconds FROM $table_name ORDER BY display_order ASC, id ASC LIMIT 1");

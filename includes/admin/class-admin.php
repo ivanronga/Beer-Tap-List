@@ -100,7 +100,8 @@ class Beer_Festival_Admin {
         if ($hook === 'beer-festival_page_beer-festival-qr-codes') {
             wp_enqueue_style('bftl-admin', plugins_url('../admin/css/admin-styles.css', __FILE__), [], BEER_FESTIVAL_VERSION);
             wp_enqueue_script('bftl-qrcode', plugins_url('../public/js/qrcode.min.js', __FILE__), [], '1.4.4', true);
-            wp_enqueue_script('bftl-qr-codes', plugins_url('../admin/js/qr-codes.js', __FILE__), ['bftl-qrcode'], BEER_FESTIVAL_VERSION, true);
+            wp_enqueue_script('bftl-jszip', plugins_url('../admin/js/jszip.min.js', __FILE__), [], '3.10.1', true);
+            wp_enqueue_script('bftl-qr-codes', plugins_url('../admin/js/qr-codes.js', __FILE__), ['bftl-qrcode', 'bftl-jszip'], BEER_FESTIVAL_VERSION, true);
             return;
         }
         if ($hook === 'beer-festival_page_beer-festival-import-export') {
@@ -293,7 +294,10 @@ class Beer_Festival_Admin {
                     <option value="<?php echo esc_attr($filter_category); ?>"><?php echo esc_html($filter_category); ?></option>
                     <?php endforeach; ?>
                 </select>
+                <button type="button" class="button button-primary" id="bftl-qr-download-all"><?php _e('Download all as ZIP', 'beer-festival-tap'); ?></button>
+                <span id="bftl-qr-download-status" class="description" role="status"></span>
             </p>
+            <p class="description"><?php _e('The ZIP holds one plain QR image per beer (only the beers currently shown by the search and category filter). Use it with the Export on the Import/Export page to merge QR codes into a layout.', 'beer-festival-tap'); ?></p>
             <div class="bftl-qr-grid">
                 <?php foreach ($beers as $beer):
                     $brewer = get_post_meta($beer->ID, '_beer_brewer', true);
@@ -314,7 +318,7 @@ class Beer_Festival_Admin {
                     if ($abv !== '') $stats_parts[] = 'ABV: ' . $abv . '%';
                     $stats_line = implode(' • ', $stats_parts);
                 ?>
-                <div class="bftl-qr-item" data-permalink="<?php echo esc_attr($this->get_stable_beer_url($beer->ID)); ?>" data-brewer="<?php echo esc_attr($brewer); ?>" data-category="<?php echo esc_attr($category); ?>">
+                <div class="bftl-qr-item" data-permalink="<?php echo esc_attr($this->get_stable_beer_url($beer->ID)); ?>" data-qr-file="<?php echo esc_attr(Beer_Festival_Import_Export::qr_filename($beer)); ?>" data-brewer="<?php echo esc_attr($brewer); ?>" data-category="<?php echo esc_attr($category); ?>">
                     <?php if ($category): ?>
                     <p class="bftl-qr-item-category"><?php echo esc_html($category); ?></p>
                     <?php endif; ?>
@@ -484,14 +488,20 @@ class Beer_Festival_Admin {
     }
 
     private function render_import_export_initial_step() {
-        $export_url = wp_nonce_url(admin_url('admin-post.php?action=bftl_export_csv'), 'bftl_export_csv');
         ?>
         <h2><?php _e('Export', 'beer-festival-tap'); ?></h2>
-        <p><?php _e('Download all published beers as a spreadsheet: Beer Name, Style, Category, Brewer, Location, ABV, IBU, and a QR reference link.', 'beer-festival-tap'); ?></p>
-        <p>
-            <a href="<?php echo esc_url($export_url); ?>" class="button button-primary"><?php _e('Export Beers', 'beer-festival-tap'); ?></a>
-        </p>
-        <p class="description"><?php _e('The file downloads with an .xls extension for convenience, but its content is plain CSV — Excel may show a one-time "format doesn\'t match extension" warning on open; choosing "Yes" opens it correctly.', 'beer-festival-tap'); ?></p>
+        <p><?php _e('Download all published beers as a spreadsheet: Beer Name, Style, Category, Brewer, Location, ABV, IBU, and the file name of each beer\'s QR image.', 'beer-festival-tap'); ?></p>
+        <form method="get" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+            <?php wp_nonce_field('bftl_export_csv'); ?>
+            <input type="hidden" name="action" value="bftl_export_csv">
+            <p>
+                <label for="bftl-qr-folder"><strong><?php _e('QR images folder (optional)', 'beer-festival-tap'); ?></strong></label><br>
+                <input type="text" id="bftl-qr-folder" name="qr_folder" class="regular-text" placeholder="C:\Festival\qr">
+            </p>
+            <p class="description"><?php _e('Download the images from the QR Codes page ("Download all as ZIP") and unzip them into this folder. If you enter its full path here, the QR Image column holds each image\'s full path, which layout software such as Affinity Publisher needs for data merge. Leave empty to get just the file names.', 'beer-festival-tap'); ?></p>
+            <p><button type="submit" class="button button-primary"><?php _e('Export Beers', 'beer-festival-tap'); ?></button></p>
+        </form>
+        <p class="description"><?php _e('The file is a UTF-8 CSV (beers-YYYY-MM-DD.csv) that opens in Excel, Numbers, Google Sheets and layout tools.', 'beer-festival-tap'); ?></p>
 
         <hr>
 
@@ -666,7 +676,8 @@ class Beer_Festival_Admin {
         if (!current_user_can('manage_options')) {
             wp_die(__('Unauthorized', 'beer-festival-tap'));
         }
-        Beer_Festival_Import_Export::stream_csv_export();
+        $qr_folder = isset($_GET['qr_folder']) ? sanitize_text_field(wp_unslash($_GET['qr_folder'])) : '';
+        Beer_Festival_Import_Export::stream_csv_export($qr_folder);
     }
 
     public function handle_import_upload() {
@@ -688,7 +699,7 @@ class Beer_Festival_Admin {
         }
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         if (!in_array($ext, ['csv', 'xls', 'xlsx'], true)) {
-            $this->redirect_to_import_export('', __('Please upload a .csv or .xls file.', 'beer-festival-tap'));
+            $this->redirect_to_import_export('', __('Please upload a .csv file.', 'beer-festival-tap'));
         }
 
         $parsed = Beer_Festival_Import_Export::parse_csv_file($file['tmp_name']);

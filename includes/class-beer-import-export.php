@@ -2,19 +2,45 @@
 if (!defined('ABSPATH')) exit;
 
 /**
- * CSV export/import for beer posts. Content is plain CSV; the export is
- * served with a .xls filename per user preference (Excel will show a
- * "format doesn't match extension" warning on open -- expected, not a bug).
+ * CSV export/import for beer posts. The export is a UTF-8 CSV with a BOM so
+ * Excel reads accented names correctly. Import still accepts .xls-named files
+ * because earlier versions exported CSV content under that extension.
  */
 class Beer_Festival_Import_Export {
 
     const MAX_IMPORT_ROWS = 2000;
 
     public static function export_headers() {
-        return ['Beer Name', 'Style', 'Category', 'Brewer', 'Location', 'ABV', 'IBU', 'QR Code'];
+        return ['Beer Name', 'Style', 'Category', 'Brewer', 'Location', 'ABV', 'IBU', 'QR Image'];
     }
 
-    public static function build_export_row($beer) {
+    /**
+     * File name of a beer's QR image in the "Download all as ZIP" bundle. The
+     * id keeps it unique and stable even if two beers share a name or one is
+     * renamed. Shared by the export column and the QR Codes page so the CSV
+     * always points at the files the ZIP contains.
+     */
+    public static function qr_filename($beer) {
+        $slug = sanitize_title($beer->post_title);
+        return ($slug !== '' ? $slug : 'beer') . '-' . intval($beer->ID) . '.png';
+    }
+
+    // Folder the user will unzip the QR images into, normalised to end with a
+    // separator so it can simply be put in front of the file name. Layout
+    // software (e.g. Affinity Publisher data merge) needs the full file path.
+    public static function normalize_qr_folder($folder) {
+        $folder = trim((string) $folder);
+        if ($folder === '') {
+            return '';
+        }
+        $last = substr($folder, -1);
+        if ($last === '/' || $last === '\\') {
+            return $folder;
+        }
+        return $folder . (strpos($folder, '\\') !== false ? '\\' : '/');
+    }
+
+    public static function build_export_row($beer, $qr_folder = '') {
         return [
             $beer->post_title,
             get_post_meta($beer->ID, '_beer_stil', true),
@@ -23,7 +49,7 @@ class Beer_Festival_Import_Export {
             get_post_meta($beer->ID, '_beer_location', true),
             get_post_meta($beer->ID, '_beer_abv', true),
             get_post_meta($beer->ID, '_beer_ibu', true),
-            Beer_Festival_Admin::get_stable_beer_url($beer->ID),
+            $qr_folder . self::qr_filename($beer),
         ];
     }
 
@@ -37,7 +63,8 @@ class Beer_Festival_Import_Export {
         return $value;
     }
 
-    public static function stream_csv_export() {
+    public static function stream_csv_export($qr_folder = '') {
+        $qr_folder = self::normalize_qr_folder($qr_folder);
         $beers = get_posts([
             'post_type'    => 'beer',
             'post_status'  => 'publish',
@@ -48,14 +75,14 @@ class Beer_Festival_Import_Export {
 
         nocache_headers();
         header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="beers-' . gmdate('Y-m-d') . '.xls"');
+        header('Content-Disposition: attachment; filename="beers-' . gmdate('Y-m-d') . '.csv"');
 
         $out = fopen('php://output', 'w');
         fwrite($out, "\xEF\xBB\xBF"); // UTF-8 BOM so Excel reads accented names correctly.
 
         fputcsv($out, self::export_headers());
         foreach ($beers as $beer) {
-            fputcsv($out, array_map([__CLASS__, 'guard_formula_injection'], self::build_export_row($beer)));
+            fputcsv($out, array_map([__CLASS__, 'guard_formula_injection'], self::build_export_row($beer, $qr_folder)));
         }
         fclose($out);
         exit;
