@@ -262,7 +262,19 @@ class Beer_Festival_Public {
         }
     
         ob_start();
-        $tap_list_html = '<div class="bftl-tap-list" style="--bftl-tap-rows: ' . intval($num_taps) . ';">';
+        // Field labels shown on the mobile cards. They sit on the list root so the
+        // live-refresh script can build identical rows without its own strings.
+        $labels = [
+            'name'     => __('Ime piva', 'beer-festival-tap'),
+            'style'    => __('Stil', 'beer-festival-tap'),
+            'brewer'   => __('Pivar', 'beer-festival-tap'),
+            'location' => __('Lokacija', 'beer-festival-tap'),
+        ];
+        $tap_list_html = '<div class="bftl-tap-list" style="--bftl-tap-rows: ' . intval($num_taps) . ';"'
+            . ' data-label-name="' . esc_attr($labels['name']) . '"'
+            . ' data-label-style="' . esc_attr($labels['style']) . '"'
+            . ' data-label-brewer="' . esc_attr($labels['brewer']) . '"'
+            . ' data-label-location="' . esc_attr($labels['location']) . '">';
 
         // Row banding follows zone-category groups (all taps in the same zone share
         // a band), not individual rows -- flips only when the zone category changes.
@@ -291,19 +303,37 @@ class Beer_Festival_Public {
             $tap_list_html .= '<div class="tap-item--inner is-tap-number" data-category="' . esc_attr($zone_category) . '"><div class="tap-number" data-category="' . esc_attr($zone_category) . '">' . esc_html($tap_id) . '</div></div>';
 
             if ($beer) {
-                $tap_list_html .= '<div class="tap-item--inner beer-name">' . esc_html($beer->post_title);
+                // .tap-body / .tap-meta / .tap-stats group the fields into the
+                // mobile card; on wider screens they are display:contents so the
+                // desktop grid still sees the fields as direct children of the row.
+                $tap_list_html .= '<div class="tap-body">';
+
+                $tap_list_html .= '<div class="tap-item--inner beer-name" data-label="' . esc_attr($labels['name']) . '">' . esc_html($beer->post_title);
 
                 if ($is_new) {
-                    $tap_list_html .= ' <div class="new-indicator">NEW!</div>';
+                    // Beside the name on wide screens; on mobile it is hidden and the
+                    // copy in the IBU/ABV row below is shown instead.
+                    $tap_list_html .= ' <div class="new-indicator new-indicator--name">NEW!</div>';
                 }
 
                 $tap_list_html .= '</div>';
 
-                $tap_list_html .= '<div class="tap-item--inner is-beer-style"><div class="beer-style" data-category="' . esc_attr($category) . '">' . esc_html(get_post_meta($beer->ID, '_beer_stil', true)) . '</div></div>';
-                $tap_list_html .= '<div class="tap-item--inner brewer-name">' . esc_html(get_post_meta($beer->ID, '_beer_brewer', true)) . '</div>';
-                $tap_list_html .= '<div class="tap-item--inner brewer-location">' . esc_html(get_post_meta($beer->ID, '_beer_location', true)) . '</div>';
-                $tap_list_html .= '<div class="tap-item--inner ibu"><i class="icon icon--hops"></i> <span class="ibu--inner">' . esc_html(get_post_meta($beer->ID, '_beer_ibu', true)) . '</span></div>';
-                $tap_list_html .= '<div class="tap-item--inner abv"><i class="icon icon--flask"></i> <span>' . esc_html(get_post_meta($beer->ID, '_beer_abv', true)) . '%</span></div>';
+                $tap_list_html .= '<div class="tap-item--inner is-beer-style" data-label="' . esc_attr($labels['style']) . '"><div class="beer-style" data-category="' . esc_attr($category) . '">' . esc_html(get_post_meta($beer->ID, '_beer_stil', true)) . '</div></div>';
+
+                $tap_list_html .= '<div class="tap-meta">';
+                $tap_list_html .= '<div class="tap-item--inner brewer-name" data-label="' . esc_attr($labels['brewer']) . '">' . esc_html(get_post_meta($beer->ID, '_beer_brewer', true)) . '</div>';
+                $tap_list_html .= '<div class="tap-item--inner brewer-location" data-label="' . esc_attr($labels['location']) . '">' . esc_html(get_post_meta($beer->ID, '_beer_location', true)) . '</div>';
+                $tap_list_html .= '</div>';
+
+                $tap_list_html .= '<div class="tap-stats">';
+                $tap_list_html .= '<div class="tap-item--inner ibu"><i class="icon icon--hops"></i> <span class="stat-label">IBU</span> <span class="ibu--inner">' . esc_html(get_post_meta($beer->ID, '_beer_ibu', true)) . '</span></div>';
+                $tap_list_html .= '<div class="tap-item--inner abv"><i class="icon icon--flask"></i> <span class="stat-label">ABV</span> <span class="abv--inner">' . esc_html(get_post_meta($beer->ID, '_beer_abv', true)) . '%</span></div>';
+                if ($is_new) {
+                    $tap_list_html .= '<div class="new-indicator new-indicator--stats">NEW!</div>';
+                }
+                $tap_list_html .= '</div>';
+
+                $tap_list_html .= '</div>';
             } else {
                 $tap_list_html .= '<div class="tap-item--inner beer-details empty-tap"><div class="empty-tap--inner">No beer assigned</div></div>';
             }
