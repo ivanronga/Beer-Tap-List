@@ -26,11 +26,19 @@ class Beer_Festival_REST {
         register_rest_route(self::NAMESPACE_, '/taps/assign', [
             'methods'             => WP_REST_Server::CREATABLE,
             'callback'            => [$this, 'assign_tap'],
-            'permission_callback' => '__return_true',
+            // Open by design for the QR-code staff flow, but the switch and
+            // the optional staff PIN in Settings are enforced here.
+            'permission_callback' => ['Beer_Festival_Staff_Access', 'authorize_assign'],
             'args'                => [
                 'tap_id'  => ['required' => true, 'type' => 'integer'],
                 'beer_id' => ['required' => false, 'type' => 'integer', 'default' => 0],
             ],
+        ]);
+
+        register_rest_route(self::NAMESPACE_, '/staff/verify', [
+            'methods'             => WP_REST_Server::CREATABLE,
+            'callback'            => [$this, 'verify_staff'],
+            'permission_callback' => ['Beer_Festival_Staff_Access', 'authorize_verify'],
         ]);
 
         register_rest_route(self::NAMESPACE_, '/taps/category', [
@@ -62,6 +70,11 @@ class Beer_Festival_REST {
             return $data;
         }
         return rest_ensure_response($data);
+    }
+
+    // Reaching the callback means the permission check (PIN included) passed.
+    public function verify_staff(WP_REST_Request $request) {
+        return rest_ensure_response(['ok' => true]);
     }
 
     public function assign_tap(WP_REST_Request $request) {

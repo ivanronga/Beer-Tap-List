@@ -76,6 +76,61 @@ class Beer_Festival_Settings {
             'beer-festival-settings',
             'beer_festival_main_section'
         );
+
+        add_settings_section(
+            'beer_festival_staff_section',
+            __('Staff Access (Beer Pages)', 'beer-festival-tap'),
+            function () {
+                echo '<p>' . esc_html__('Staff publish and remove beers on taps by scanning a beer\'s QR code, without logging in. Use these options to restrict that. Logged-in administrators and the Tap Management page are never affected.', 'beer-festival-tap') . '</p>';
+            },
+            'beer-festival-settings'
+        );
+
+        add_settings_field(
+            'staff_changes_enabled',
+            __('Tap Changes', 'beer-festival-tap'),
+            [$this, 'field_staff_changes_enabled'],
+            'beer-festival-settings',
+            'beer_festival_staff_section'
+        );
+
+        add_settings_field(
+            'staff_pin',
+            __('Staff PIN', 'beer-festival-tap'),
+            [$this, 'field_staff_pin'],
+            'beer-festival-settings',
+            'beer_festival_staff_section'
+        );
+    }
+
+    public function field_staff_changes_enabled() {
+        $options = get_option($this->option_name, []);
+        $enabled = !isset($options['staff_changes_enabled']) || !empty($options['staff_changes_enabled']);
+        ?>
+        <input type="hidden" name="beer_festival_settings[staff_changes_enabled]" value="0">
+        <label>
+            <input type="checkbox" name="beer_festival_settings[staff_changes_enabled]" value="1" <?php checked($enabled); ?>>
+            <?php _e('Allow publishing and removing beers from beer pages', 'beer-festival-tap'); ?>
+        </label>
+        <p class="description"><?php _e('Untick this to switch tap changes off completely, for example if someone is abusing the QR links. Beer pages then become read-only and the server rejects changes. Tick it again to restore access.', 'beer-festival-tap'); ?></p>
+        <?php
+    }
+
+    public function field_staff_pin() {
+        $options = get_option($this->option_name, []);
+        $enabled = !empty($options['staff_pin_enabled']);
+        $pin = isset($options['staff_pin']) ? (string) $options['staff_pin'] : '';
+        ?>
+        <input type="hidden" name="beer_festival_settings[staff_pin_enabled]" value="0">
+        <label>
+            <input type="checkbox" name="beer_festival_settings[staff_pin_enabled]" value="1" <?php checked($enabled); ?>>
+            <?php _e('Require a PIN to change taps from beer pages', 'beer-festival-tap'); ?>
+        </label>
+        <p>
+            <input type="text" name="beer_festival_settings[staff_pin]" value="<?php echo esc_attr($pin); ?>" class="regular-text" autocomplete="off" maxlength="<?php echo intval(Beer_Festival_Staff_Access::PIN_MAX_LEN); ?>" placeholder="<?php esc_attr_e('e.g. 4821', 'beer-festival-tap'); ?>">
+        </p>
+        <p class="description"><?php printf(esc_html__('%1$d–%2$d characters. Staff enter it once per phone; the phone remembers it. Changing the PIN here locks out every phone until its user enters the new one. Wrong guesses are rate limited per IP address.', 'beer-festival-tap'), Beer_Festival_Staff_Access::PIN_MIN_LEN, Beer_Festival_Staff_Access::PIN_MAX_LEN); ?></p>
+        <?php
     }
 
     public function field_frontend_wrapper() {
@@ -230,6 +285,47 @@ $new['frontend_wrapper'] = in_array($wrapper, $allowed_wrappers, true) ? $wrappe
         } else {
             $new['new_beer_duration'] = $duration;
         }
+
+        // Staff access: master switch, then the optional shared PIN.
+        // Fields that were not submitted at all (a programmatic update, not the
+        // settings form) keep their stored value instead of resetting.
+        if (!isset($input['staff_changes_enabled'])) {
+            $new['staff_changes_enabled'] = !isset($options['staff_changes_enabled']) || !empty($options['staff_changes_enabled']) ? 1 : 0;
+        } else {
+            $new['staff_changes_enabled'] = !empty($input['staff_changes_enabled']) ? 1 : 0;
+        }
+
+        if (!isset($input['staff_pin']) && !isset($input['staff_pin_enabled'])) {
+            $new['staff_pin_enabled'] = !empty($options['staff_pin_enabled']) ? 1 : 0;
+            $new['staff_pin'] = isset($options['staff_pin']) ? (string) $options['staff_pin'] : '';
+            return $new;
+        }
+
+        $pin = isset($input['staff_pin']) ? trim(sanitize_text_field(wp_unslash($input['staff_pin']))) : '';
+        $pin_enabled = !empty($input['staff_pin_enabled']);
+        $pin_length = strlen($pin);
+        $pin_ok = $pin_length >= Beer_Festival_Staff_Access::PIN_MIN_LEN && $pin_length <= Beer_Festival_Staff_Access::PIN_MAX_LEN;
+
+        if ($pin_enabled && !$pin_ok) {
+            add_settings_error(
+                $this->option_name,
+                'staff_pin_invalid',
+                sprintf(
+                    __('The staff PIN must be %1$d–%2$d characters. The PIN requirement was not enabled.', 'beer-festival-tap'),
+                    Beer_Festival_Staff_Access::PIN_MIN_LEN,
+                    Beer_Festival_Staff_Access::PIN_MAX_LEN
+                ),
+                'error'
+            );
+            $pin_enabled = false;
+        }
+        if ($pin !== '' && !$pin_ok) {
+            // Never store a PIN that could not be used; keep whatever was valid before.
+            $pin = isset($options['staff_pin']) ? (string) $options['staff_pin'] : '';
+        }
+
+        $new['staff_pin_enabled'] = $pin_enabled ? 1 : 0;
+        $new['staff_pin'] = $pin;
 
         return $new;
     }
