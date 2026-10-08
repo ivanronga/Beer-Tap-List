@@ -2,8 +2,9 @@
 /**
  * Plugin Name: Beer Festival Tap List
  * Description: Real-time tap list management for beer festivals
- * Version: 2.19.0
- * Author: Beer Festival Tap List Contributors
+ * Version: 2.19.1
+ * Author: Ivan Bašić
+ * Author URI: https://www.panonski-pivarski-sindikat.hr
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Tested up to: 7.1
@@ -20,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('BEER_FESTIVAL_VERSION', '2.19.0');
+define('BEER_FESTIVAL_VERSION', '2.19.1');
 define('BEER_FESTIVAL_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BEER_FESTIVAL_PLUGIN_URL', plugin_dir_url(__FILE__));
 
