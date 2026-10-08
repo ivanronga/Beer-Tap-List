@@ -210,5 +210,85 @@ document.addEventListener('DOMContentLoaded', function() {
         categoryFilter.addEventListener('change', applyFilters);
     }
 
+    // Plain QR code (no text) as a PNG blob, with a white quiet zone around it
+    // so layout software and phone scanners both read it reliably.
+    function generatePlainQrBlob(url) {
+        return new Promise(function(resolve, reject) {
+            var qr = qrcode(0, 'M');
+            qr.addData(url);
+            qr.make();
+
+            var img = new Image();
+            img.onload = function() {
+                var canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                var ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.imageSmoothingEnabled = false;
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob(function(blob) {
+                    blob ? resolve(blob) : reject(new Error('PNG export failed'));
+                }, 'image/png');
+            };
+            img.onerror = function() { reject(new Error('QR render failed')); };
+            // 16px per module + a 4-module (64px) quiet zone.
+            img.src = qr.createDataURL(16, 64);
+        });
+    }
+
+    // Bundles one plain QR PNG per currently visible beer into a single ZIP.
+    // File names come from the server (data-qr-file) so they always match the
+    // QR Image column of the beer export.
+    var downloadAllButton = document.getElementById('bftl-qr-download-all');
+    var downloadStatus = document.getElementById('bftl-qr-download-status');
+
+    if (downloadAllButton) {
+        downloadAllButton.addEventListener('click', function() {
+            if (typeof JSZip === 'undefined') {
+                downloadStatus.textContent = 'ZIP library failed to load.';
+                return;
+            }
+
+            var items = Array.prototype.filter.call(document.querySelectorAll('.bftl-qr-item'), function(item) {
+                return item.style.display !== 'none';
+            });
+            if (!items.length) {
+                downloadStatus.textContent = 'No beers to download.';
+                return;
+            }
+
+            var zip = new JSZip();
+            var done = 0;
+            downloadAllButton.disabled = true;
+
+            items.reduce(function(chain, item) {
+                return chain.then(function() {
+                    return generatePlainQrBlob(item.getAttribute('data-permalink')).then(function(blob) {
+                        zip.file(item.getAttribute('data-qr-file'), blob);
+                        done++;
+                        downloadStatus.textContent = done + ' / ' + items.length;
+                    });
+                });
+            }, Promise.resolve()).then(function() {
+                return zip.generateAsync({ type: 'blob' });
+            }).then(function(zipBlob) {
+                var link = document.createElement('a');
+                link.href = URL.createObjectURL(zipBlob);
+                link.download = 'beer-qr-codes.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(function() { URL.revokeObjectURL(link.href); }, 1000);
+                downloadStatus.textContent = done + ' QR images downloaded.';
+            }).catch(function(err) {
+                downloadStatus.textContent = 'Failed: ' + err.message;
+            }).then(function() {
+                downloadAllButton.disabled = false;
+            });
+        });
+    }
+
     renderCardCodes();
 });
