@@ -4,7 +4,7 @@ Tags: beer, festival, tap list, events
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.19.1
+Stable tag: 2.20.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,16 @@ your own protection if that is not acceptable.
 Its tables, options and temporary data are removed. Your Beer posts are kept.
 
 == Changelog ==
+
+= 2.20.1 =
+* The lighter alternating row colour on the tap list is a bit darker (it looked too bright on projectors).
+
+= 2.20.0 =
+* Smoother refreshes: the tap list only touches the page when a value really changed, and the NEW! pill no longer blinks on every refresh.
+* Fixed iframe mode serving old copies of its scripts and popup styles after an update: those files now carry the plugin version in their address.
+* Removed the Auto-refresh Interval setting. The board refreshes every 5 seconds in iframe mode and every 30 seconds on a normal page (filter: bftl_refresh_interval).
+* Iframe mode loads its stylesheet before the board, so a page load no longer flashes unstyled.
+* A quiet safety-net reload (every 30 minutes, never during a popup or when the server is unreachable) replaces the theme's 60-second page reload, which can now be removed. Filter: bftl_safety_reload_minutes (0 disables).
 
 = 2.19.1 =
 * Updated the plugin author details.

@@ -67,7 +67,7 @@
     --bftl-bg:#fbfbfb;
     --bftl-bg-color:var(--bftl-bg);
     --bftl-row-bg:#22252d;
-    --bftl-row-highlight-bg:rgba(255,255,255,.15);
+    --bftl-row-highlight-bg:rgba(255,255,255,.10);
 
     background-color:var(--bftl-row-bg);
     color:var(--bftl-color-text);

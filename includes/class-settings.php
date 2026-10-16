@@ -32,7 +32,6 @@ class Beer_Festival_Settings {
                 'sanitize_callback' => [$this, 'sanitize_settings'],
                 'default' => [
                     'tap_count' => 16,
-                    'refresh_interval' => 30,
                     'new_beer_duration' => 60
                 ]
             ]
@@ -49,14 +48,6 @@ class Beer_Festival_Settings {
             'tap_count',
             __('Number of Taps', 'beer-festival-tap'),
             [$this, 'field_tap_count'],
-            'beer-festival-settings',
-            'beer_festival_main_section'
-        );
-
-        add_settings_field(
-            'refresh_interval',
-            __('Auto-refresh Interval (seconds)', 'beer-festival-tap'),
-            [$this, 'field_refresh_interval'],
             'beer-festival-settings',
             'beer_festival_main_section'
         );
@@ -170,13 +161,6 @@ class Beer_Festival_Settings {
         echo '<p class="description">' . __('Set the total number of taps (1–100).', 'beer-festival-tap') . '</p>';
     }
 
-    public function field_refresh_interval() {
-        $options = get_option($this->option_name, []);
-        $value = isset($options['refresh_interval']) ? intval($options['refresh_interval']) : 30;
-        echo '<input type="number" name="beer_festival_settings[refresh_interval]" min="5" max="300" value="' . esc_attr($value) . '" />';
-        echo '<p class="description">' . __('How often the tap list auto-refreshes for users (in seconds).', 'beer-festival-tap') . '</p>';
-    }
-
     public function field_new_beer_duration() {
         $options = get_option($this->option_name);
         $value = $options['new_beer_duration'] ?? 5; // Same key here
@@ -271,20 +255,6 @@ $new['frontend_wrapper'] = in_array($wrapper, $allowed_wrappers, true) ? $wrappe
             // Optional: check for active assignments above new tap count
             // You can add logic here to warn if reducing below current assignments
             $new['tap_count'] = $tap_count;
-        }
-
-        // Refresh interval
-        $refresh = isset($input['refresh_interval']) ? intval($input['refresh_interval']) : 30;
-        if ($refresh < 5 || $refresh > 300) {
-            add_settings_error(
-                $this->option_name,
-                'refresh_interval_invalid',
-                __('Auto-refresh interval must be between 5 and 300 seconds.', 'beer-festival-tap'),
-                'error'
-            );
-            $new['refresh_interval'] = isset($options['refresh_interval']) ? $options['refresh_interval'] : 30;
-        } else {
-            $new['refresh_interval'] = $refresh;
         }
 
         // New beer indicator duration

@@ -31,7 +31,7 @@ A WordPress plugin for real-time tap list management at beer festivals. Manage a
 ## Deployment notes
 
 - **Open tap endpoint.** `POST /taps/assign` is intentionally unauthenticated so staff can publish a beer from a QR code without logging in. Anyone who can reach the site can change taps; use it on a trusted network or add your own protection. Beer pages are `noindex`.
-- **Theme.** The board and the staff page are designed for the Hombre theme. The board relies on the theme reloading the page periodically; popup timing survives that by keeping its schedule in `localStorage`.
+- **Theme.** The board and the staff page are designed for the Hombre theme. The board updates itself live (every 5 seconds in the iframe wrapper, every 30 on a normal page; filter `bftl_refresh_interval`), so the Hombre theme's `<meta http-equiv="refresh" content="60">` in `header.php` is no longer needed and causes a visible blink once a minute; remove that line. The plugin reloads the page quietly every 30 minutes as a safety net (not during a popup, and only if the server answers; filter `bftl_safety_reload_minutes`, `0` disables). Popup timing survives any reload because its schedule is kept in `localStorage`.
 - **Uninstall.** Deleting the plugin removes its tables, options and temporary data. Beer posts are kept.
 - **Fonts.** Figtree is bundled in `includes/public/fonts/` (SIL Open Font License); nothing is loaded from Google by the plugin.
 
