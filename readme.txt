@@ -4,7 +4,7 @@ Tags: beer, festival, tap list, events
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.20.1
+Stable tag: 2.20.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,9 @@ your own protection if that is not acceptable.
 Its tables, options and temporary data are removed. Your Beer posts are kept.
 
 == Changelog ==
+
+= 2.20.2 =
+* The lighter alternating row colour is darker still (white 10% -> 6%).
 
 = 2.20.1 =
 * The lighter alternating row colour on the tap list is a bit darker (it looked too bright on projectors).
