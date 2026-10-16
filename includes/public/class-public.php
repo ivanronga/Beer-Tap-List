@@ -122,6 +122,26 @@ class Beer_Festival_Public {
      * the tap list is shown as cards. Set on the Settings page because the
      * display used at the event is not known in advance.
      */
+    /**
+     * Minutes between the quiet safety-net page reloads (0 = never). The board
+     * updates itself live, so this only guards against a page left running for
+     * hours going stale. Filter: bftl_safety_reload_minutes.
+     */
+    public static function get_safety_reload_minutes() {
+        return max(0, intval(apply_filters('bftl_safety_reload_minutes', 30)));
+    }
+
+    /**
+     * Seconds between the board's in-place data refreshes. Fixed rather than a
+     * setting: 5 for the iframe wrapper (a dedicated screen at the event) and 30
+     * for the normal page (visitors' phones, which share the server). Filter:
+     * bftl_refresh_interval( seconds, 'iframe' | 'div' ), never below 5.
+     */
+    public static function get_refresh_interval($wrapper) {
+        $default = $wrapper === 'iframe' ? 5 : 30;
+        return max(5, intval(apply_filters('bftl_refresh_interval', $default, $wrapper)));
+    }
+
     public static function get_desktop_breakpoint() {
         $settings = get_option('beer_festival_settings', []);
         $bp = isset($settings['desktop_breakpoint']) ? intval($settings['desktop_breakpoint']) : self::BREAKPOINT_DEFAULT;
@@ -223,6 +243,16 @@ class Beer_Festival_Public {
         echo self::build_styles_css($breakpoint);
         exit;
     }
+    /**
+     * Same as get_asset_url() with the plugin version in the query string. WordPress
+     * adds it by itself when enqueueing, but the iframe wrapper writes its own
+     * <script>/<link> tags, and without a version a browser keeps serving the
+     * old copy of a file after the plugin has been updated.
+     */
+    private function get_versioned_asset_url($relative_path) {
+        return add_query_arg('ver', BEER_FESTIVAL_VERSION, $this->get_asset_url($relative_path));
+    }
+
     private function get_asset_url($relative_path) {
         return plugins_url('includes/public/' . $relative_path, BEER_FESTIVAL_PLUGIN_DIR . 'beer-festival-tap-list.php');
     }
@@ -288,7 +318,6 @@ class Beer_Festival_Public {
             return;
         }
 
-        $refresh_interval = isset($settings['refresh_interval']) ? intval($settings['refresh_interval']) : 30;
         $new_duration = isset($settings['new_beer_duration']) ? intval($settings['new_beer_duration']) : 60;
 
         wp_enqueue_style(
@@ -311,8 +340,9 @@ class Beer_Festival_Public {
             'BFTLFront',
             array(
                 'rest_url' => rest_url('beer-festival-tap-list/v1/taps'),
-                'refresh_interval' => $refresh_interval,
+                'refresh_interval' => self::get_refresh_interval('div'),
                 'new_duration' => $new_duration,
+                'safety_reload_minutes' => self::get_safety_reload_minutes(),
                 'css_url' => $this->get_styles_url()
             )
         );
@@ -476,18 +506,19 @@ class Beer_Festival_Public {
                 var doc = iframe.contentWindow.document;
                 doc.open();
                 doc.write(\'<style>html,body{margin:0;padding:0;background:#22252d}</style>\');
-                doc.write(' . json_encode('<div class="bftl-board">' . $tap_list_html . '</div>') . ');
                 doc.write(\'<link rel="stylesheet" href="' . esc_url($this->get_styles_url()) . '">\');
-                doc.write(\'<link rel="stylesheet" href="' . esc_url($this->get_asset_url('css/tap-list-ads.css')) . '">\');
+                doc.write(\'<link rel="stylesheet" href="' . esc_url($this->get_versioned_asset_url('css/tap-list-ads.css')) . '">\');
+                doc.write(' . json_encode('<div class="bftl-board">' . $tap_list_html . '</div>') . ');
                 doc.write(\'<script type="text/javascript" src="' . esc_url(includes_url('js/jquery/jquery.min.js')) . '"><\/script>\');
-                doc.write(\'<script type="text/javascript" src="' . esc_url($this->get_asset_url('js/tap-list-display.js')) . '"><\/script>\');
+                doc.write(\'<script type="text/javascript" src="' . esc_url($this->get_versioned_asset_url('js/tap-list-display.js')) . '"><\/script>\');
                 doc.write(\'<script type="text/javascript">var BFTLFront = ' . json_encode([
                     'rest_url' => rest_url('beer-festival-tap-list/v1/taps'),
-                    'refresh_interval' => 5,
+                    'refresh_interval' => self::get_refresh_interval('iframe'),
+                    'safety_reload_minutes' => self::get_safety_reload_minutes(),
                     'new_duration' => isset($settings['new_beer_duration']) ? intval($settings['new_beer_duration']) : 60,
                     'css_url' => $this->get_styles_url()
                 ]) . ';<\/script>\');
-                doc.write(\'<script type="text/javascript" src="' . esc_url($this->get_asset_url('js/tap-list-ads.js')) . '"><\/script>\');
+                doc.write(\'<script type="text/javascript" src="' . esc_url($this->get_versioned_asset_url('js/tap-list-ads.js')) . '"><\/script>\');
                 doc.write(\'<script type="text/javascript">var BFTLAds = ' . json_encode($this->get_ads_payload()) . ';<\/script>\');
                 doc.close();
             })();
